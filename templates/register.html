@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Registration - Smart Traffic Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.7">
+    <style>
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px rgba(10, 15, 30, 0.95) inset !important;
+            -webkit-text-fill-color: #ededed !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+    </style>
+</head>
+<body>
+    <div class="split-layout">
+        <!-- Left Visual Side: Cyber Command HUD Showcase -->
+        <div class="split-image">
+            <div class="split-visual-content">
+                <div>
+                    <div class="split-hud-badge">
+                        <span class="signal-rail"><span></span><span></span><span></span></span>
+                        <span>STMS &bull; PERSONNEL ONBOARDING</span>
+                    </div>
+                </div>
+
+                <div class="split-radar-center">
+                    <h1>Join the Command Team</h1>
+                    <p>Register as an authorized traffic operator to monitor quad-lane feeds, supervise automatic e-challan citations, and trigger emergency vehicle green corridors.</p>
+                    <div class="split-telemetry-chips">
+                        <div class="split-chip"><span class="split-chip-dot green"></span> Operator Dashboard</div>
+                        <div class="split-chip"><span class="split-chip-dot cyan"></span> Manual Override Protocol</div>
+                        <div class="split-chip"><span class="split-chip-dot amber"></span> Telemetry Archival</div>
+                    </div>
+                </div>
+
+                <div class="split-bottom-quote">
+                    <span>🛡️ Strict Role-Based Access Control (RBAC)</span>
+                    <span>&bull;</span>
+                    <span>v3.7 Multi-Theme</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Form Side: Glassmorphic Cyber Portal -->
+        <div class="split-form-wrapper">
+            <div class="split-form-box">
+                <div class="split-header-row">
+                    <div class="split-brand-lockup">
+                        <span class="signal-rail"><span></span><span></span><span></span></span>
+                        <span>STMS</span>
+                    </div>
+                    <div class="split-status-pill">
+                        <span class="live-dot" style="background: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+                        NEW REGISTRATION
+                    </div>
+                </div>
+                
+                <h2>Register Operator</h2>
+                <p class="subtext">Create an authorized account for smart intersection surveillance.</p>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="{{ url_for('register') }}" method="POST" autocomplete="off">
+                    <div class="input-field-wrap">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="username" name="username" placeholder="Desired Username" value="{{ username }}" minlength="3" maxlength="32" required autocomplete="off">
+                    </div>
+                    
+                    <div class="input-field-wrap">
+                        <span class="input-icon">📧</span>
+                        <input type="email" id="email" name="email" placeholder="Official Email (Optional)" value="{{ email }}" autocomplete="off">
+                    </div>
+
+                    <div class="input-field-wrap">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="password" name="password" placeholder="Password (Min. 8 characters)" minlength="8" required autocomplete="new-password">
+                        <button type="button" class="pwd-toggle-btn" id="toggleRegPwdBtn" title="Toggle password visibility">👁️</button>
+                    </div>
+
+                    <div class="input-field-wrap">
+                        <span class="input-icon">🛡️</span>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" minlength="8" required autocomplete="new-password">
+                    </div>
+
+                    <button type="submit" class="button submit-btn">
+                        <span>Create Operator Account</span>
+                        <span class="btn-arrow">&rarr;</span>
+                    </button>
+                </form>
+
+                <div class="auth-footer-nav">
+                    Already hold an authorized account? <br>
+                    <a href="{{ url_for('login') }}">Log In Here</a>
+                </div>
+                
+                <div class="auth-back-home">
+                    <a href="{{ url_for('home') }}" class="auth-back-btn">
+                        <span>&larr;</span>
+                        <span>Back to Public Overview</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI/UX Theme & Ripple Engine -->
+    <script src="{{ url_for('static', filename='js/interactive.js') }}"></script>
+    <script>
+        // Password visibility toggle
+        const toggleBtn = document.getElementById('toggleRegPwdBtn');
+        const pwdInput = document.getElementById('password');
+        const confirmInput = document.getElementById('confirm_password');
+        if (toggleBtn && pwdInput) {
+            toggleBtn.addEventListener('click', () => {
+                const isPassword = pwdInput.type === 'password';
+                pwdInput.type = isPassword ? 'text' : 'password';
+                if (confirmInput) confirmInput.type = isPassword ? 'text' : 'password';
+                toggleBtn.textContent = isPassword ? '🙈' : '👁️';
+            });
+        }
+    </script>
+</body>
+</html>

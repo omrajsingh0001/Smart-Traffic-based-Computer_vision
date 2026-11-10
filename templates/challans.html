@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Challan Management - STMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.3">
+    <style>
+        .challan-nav {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1.1rem 3rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .challan-nav .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .challan-nav .logo {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ededed;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .signal-rail {
+            display: inline-flex;
+            gap: 6px;
+        }
+        .signal-rail span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .signal-rail span:nth-child(1) { background: #ef4444; }
+        .signal-rail span:nth-child(2) { background: #f59e0b; }
+        .signal-rail span:nth-child(3) { background: #10b981; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 24px 60px;
+        }
+
+        .header-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1.8rem;
+            color: #ededed;
+            margin-bottom: 4px;
+        }
+        .header-subtitle {
+            color: #a1a1aa;
+            font-size: 0.92rem;
+            margin-bottom: 28px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: #a1a1aa;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .stat-card .value {
+            font-size: 1.9rem;
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 700;
+            color: #ededed;
+        }
+        .stat-card.danger .value { color: #ef4444; }
+        .stat-card.success .value { color: #10b981; }
+        .stat-card.warning .value { color: #f59e0b; }
+
+        /* Filter buttons */
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .filters {
+            display: flex;
+            gap: 8px;
+        }
+        .filter-btn {
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #a1a1aa;
+            padding: 8px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: #ededed;
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+        }
+        .filter-btn:active {
+            transform: translateY(1px) scale(0.97);
+        }
+        .filter-btn.active {
+            background: rgba(16, 185, 129, 0.18);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.45);
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+            font-weight: 600;
+        }
+
+        /* Table */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        th {
+            background: var(--surface-hi);
+            padding: 14px 18px;
+            text-align: left;
+            color: #a1a1aa;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            font-family: "Space Grotesk", sans-serif;
+        }
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-soft);
+            color: #ededed;
+            vertical-align: middle;
+        }
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .plate-badge {
+            background: #000;
+            color: #facc15;
+            border: 1px solid #ca8a04;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            letter-spacing: 0.08em;
+        }
+        .vehicle-badge {
+            background: #262626;
+            color: #a1a1aa;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+        }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-badge.unpaid {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .status-badge.paid {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-action {
+            position: relative;
+            overflow: hidden;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+        }
+        .btn-action:active {
+            transform: scale(0.95);
+        }
+        .btn-print {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ededed;
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        .btn-print:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.5);
+            color: #93c5fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+        }
+        .btn-pay {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.45);
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
+        }
+        .btn-pay:hover {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            border-color: #34d399;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45), 0 0 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .thumb {
+            width: 72px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .empty-state {
+            padding: 50px 20px;
+            text-align: center;
+            color: #71717a;
+        }
+    </style>
+</head>
+<body>
+    <nav class="challan-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="signal-rail"><span></span><span></span><span></span></span>
+                <span class="brand-title">STMS</span>
+                <span class="live-telemetry-badge" style="background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.4); color: #fda4af;">
+                    <span class="live-dot" style="background: #f43f5e; box-shadow: 0 0 8px #f43f5e;"></span> ENFORCEMENT
+                </span>
+            </div>
+            <div class="nav-hud-group">
+                <a href="{{ url_for('dashboard') }}" class="nav-pill-btn">
+                    <span class="nav-icon-orb emerald">🚦</span>
+                    <span>Live Feeds</span>
+                </a>
+                <a href="{{ url_for('analysis_page') }}" class="nav-pill-btn">
+                    <span class="nav-icon-orb cyan">📊</span>
+                    <span>Analytics</span>
+                </a>
+                <a href="{{ url_for('home') }}" class="nav-pill-btn">
+                    <span class="nav-icon-orb blue">🏠</span>
+                    <span>Home</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 8px;">
+            <h1 class="header-title" style="margin: 0;">Automated E-Challan Records</h1>
+            <span class="live-telemetry-badge" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 6px 14px; border-radius: 999px; font-size: 0.8rem; font-family: var(--font-mono); display: inline-flex; align-items: center; gap: 8px;">
+                <span class="live-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                LIVE AUTO-SYNC ACTIVE (8s)
+            </span>
+        </div>
+        <p class="header-subtitle">Real-time red-light violation detection and automatic license plate recognition (ANPR)</p>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="label">Total Violations Recorded</span>
+                <span class="value">{{ stats.total if stats and stats.total else 0 }}</span>
+            </div>
+            <div class="stat-card danger">
+                <span class="label">Pending Unpaid Challans</span>
+                <span class="value">{{ stats.unpaid if stats and stats.unpaid else 0 }}</span>
+            </div>
+            <div class="stat-card success">
+                <span class="label">Settled / Paid Challans</span>
+                <span class="value">{{ stats.paid if stats and stats.paid else 0 }}</span>
+            </div>
+            <div class="stat-card warning">
+                <span class="label">Pending Penalties (Due)</span>
+                <span class="value">₹{{ stats.pending_fine if stats and stats.pending_fine else 0 }}</span>
+                <span style="font-size: 0.72rem; color: #a1a1aa; margin-top: 3px;">Collected: ₹{{ stats.collected_fine or 0 }} &bull; Total: ₹{{ stats.total_fine or 0 }}</span>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="controls-row">
+            <div class="filters">
+                <a href="{{ url_for('challans', status='all') }}" class="filter-btn {{ 'active' if current_filter == 'all' else '' }}">All Violations</a>
+                <a href="{{ url_for('challans', status='Unpaid') }}" class="filter-btn {{ 'active' if current_filter == 'Unpaid' else '' }}">🚨 Unpaid</a>
+                <a href="{{ url_for('challans', status='Paid') }}" class="filter-btn {{ 'active' if current_filter == 'Paid' else '' }}">✅ Paid</a>
+            </div>
+            <div style="color: #a1a1aa; font-size: 0.82rem;">
+                Showing {{ challans|length }} record(s)
+            </div>
+        </div>
+
+        <!-- Challans Table -->
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Challan ID</th>
+                        <th>Evidence Snapshot</th>
+                        <th>Lane</th>
+                        <th>Vehicle</th>
+                        <th>License Plate</th>
+                        <th>Violation</th>
+                        <th>Penalty</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if challans %}
+                        {% for c in challans %}
+                        <tr>
+                            <td style="font-family: 'JetBrains Mono', monospace; font-weight: 600;">#CH-{{ "%04d"|format(c.id) }}</td>
+                            <td>
+                                {% if c.evidence_image and (c.evidence_image.startswith('http') or c.evidence_image.startswith('data:')) %}
+                                    <a href="{{ c.evidence_image }}" target="_blank">
+                                        <img src="{{ c.evidence_image }}" class="thumb" alt="Evidence" title="Click to view full photo">
+                                    </a>
+                                {% elif c.evidence_image %}
+                                    <a href="{{ url_for('static', filename='violations/' + c.evidence_image) }}" target="_blank">
+                                        <img src="{{ url_for('static', filename='violations/' + c.evidence_image) }}" class="thumb" alt="Evidence" title="Click to view full photo">
+                                    </a>
+                                {% else %}
+                                    <span style="color: #71717a; font-size: 0.8rem;">No Image</span>
+                                {% endif %}
+                            </td>
+                            <td><span style="font-weight: 600;">Lane {{ c.lane_id }}</span></td>
+                            <td><span class="vehicle-badge">{{ c.vehicle_type }}</span></td>
+                            <td><span class="plate-badge">{{ c.plate_number }}</span></td>
+                            <td><span style="color: #f87171;">{{ c.violation_type }}</span></td>
+                            <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">₹{{ c.fine_amount }}</td>
+                            <td>
+                                <span class="status-badge {{ 'unpaid' if c.status == 'Unpaid' else 'paid' }}">
+                                    {{ c.status }}
+                                </span>
+                            </td>
+                            <td style="font-size: 0.8rem; color: #a1a1aa;">{{ c.timestamp }}</td>
+                            <td>
+                                <div style="display: flex; gap: 8px;">
+                                    <a href="{{ url_for('print_challan', challan_id=c.id) }}" target="_blank" class="btn-action btn-print">
+                                        📄 Notice
+                                    </a>
+                                    {% if c.status == 'Unpaid' %}
+                                    <form action="{{ url_for('update_challan_status', challan_id=c.id) }}" method="POST" style="margin: 0;">
+                                        <input type="hidden" name="status" value="Paid">
+                                        <button type="submit" class="btn-action btn-pay">Mark Paid</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="10" class="empty-state">
+                                No violations recorded yet. The system is actively monitoring live feeds.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="signal-rail"><span></span><span></span><span></span></span>
+                STMS
+            </div>
+            <div class="footer-text">
+                &copy; 2026 Smart Traffic Management System. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/interactive.js') }}"></script>
+    <script>
+        // Auto-refresh E-Challan records every 8s so new camera violations display automatically
+        let autoRefreshTimer = setTimeout(() => {
+            if (!document.hidden) {
+                window.location.reload();
+            }
+        }, 8000);
+    </script>
+</body>
+</html>

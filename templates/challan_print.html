@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Challan Notice #CH-{{ "%04d"|format(challan.id) }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f5;
+            color: #18181b;
+            margin: 0;
+            padding: 30px;
+        }
+        .notice-card {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border: 2px solid #18181b;
+            border-radius: 8px;
+            padding: 36px 42px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #18181b;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .header p {
+            margin: 4px 0 0;
+            color: #52525b;
+            font-size: 0.9rem;
+        }
+        .badge {
+            display: inline-block;
+            background: #ef4444;
+            color: #fff;
+            padding: 4px 12px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .info-item {
+            border-bottom: 1px dashed #d4d4d8;
+            padding-bottom: 6px;
+        }
+        .info-label {
+            font-size: 0.78rem;
+            color: #71717a;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .info-value {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #09090b;
+        }
+        .plate-box {
+            background: #000;
+            color: #facc15;
+            padding: 4px 10px;
+            display: inline-block;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 1.2rem;
+            letter-spacing: 0.08em;
+        }
+        .evidence-section {
+            margin: 24px 0;
+            text-align: center;
+        }
+        .evidence-img {
+            max-width: 100%;
+            height: auto;
+            max-height: 380px;
+            border: 2px solid #e4e4e7;
+            border-radius: 6px;
+        }
+        .penalty-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .penalty-amount {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #b91c1c;
+        }
+        .footer {
+            border-top: 1px solid #e4e4e7;
+            padding-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #71717a;
+        }
+        .print-btn {
+            background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 26px;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        .print-btn:active {
+            transform: translateY(1px) scale(0.98);
+        }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .notice-card { border: none; box-shadow: none; padding: 0; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center; margin-bottom: 16px;" class="no-print">
+        <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    </div>
+
+    <div class="notice-card">
+        <div class="header">
+            <h1>Traffic Police Enforcement Department</h1>
+            <p>Smart Traffic Management & Automated Enforcement System</p>
+            <span class="badge">E-CHALLAN / VIOLATION NOTICE</span>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Challan Number</div>
+                <div class="info-value">#CH-{{ "%04d"|format(challan.id) }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Date & Time of Violation</div>
+                <div class="info-value">{{ challan.timestamp }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Vehicle Registration Number</div>
+                <div class="info-value">
+                    <span class="plate-box">{{ challan.plate_number }}</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Vehicle Classification</div>
+                <div class="info-value">{{ challan.vehicle_type }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Location / Intersection</div>
+                <div class="info-value">STMS Junction - Lane {{ challan.lane_id }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Violation Offense</div>
+                <div class="info-value" style="color: #b91c1c;">{{ challan.violation_type }} (Sec 184 MVA)</div>
+            </div>
+        </div>
+
+        <div class="penalty-box">
+            <div>
+                <div style="font-weight: bold; font-size: 1.1rem; color: #18181b;">Penalty Amount Payable</div>
+                <div style="font-size: 0.85rem; color: #71717a;">Status: <strong>{{ challan.status }}</strong></div>
+            </div>
+            <div class="penalty-amount">₹{{ challan.fine_amount }}.00</div>
+        </div>
+
+        <div class="evidence-section">
+            <div style="font-weight: bold; font-size: 0.9rem; text-align: left; margin-bottom: 8px;">
+                📸 Photographic Evidence (High-Resolution ANPR Capture):
+            </div>
+            {% if challan.evidence_image and (challan.evidence_image.startswith('http') or challan.evidence_image.startswith('data:')) %}
+                <img src="{{ challan.evidence_image }}" class="evidence-img" alt="Violation Snapshot">
+            {% elif challan.evidence_image %}
+                <img src="{{ url_for('static', filename='violations/' + challan.evidence_image) }}" class="evidence-img" alt="Violation Snapshot">
+            {% else %}
+                <p style="color: #71717a;">No photographic evidence recorded.</p>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            <div>
+                System-generated computer notice &middot; Valid without physical signature.
+            </div>
+            <div>
+                STMS Smart Enforcement Unit
+            </div>
+        </div>
+    </div>
+</body>
+</html>

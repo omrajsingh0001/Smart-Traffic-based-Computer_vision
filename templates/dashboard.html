@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Traffic Dashboard - STMS</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.3">
+
+
+
+    <style>          
+
+
+
+
+
+        /* Remove conflicting body styles to use style.css global body */
+
+        
+
+
+
+
+
+        .dash-nav .nav-container {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            max-width: 1400px;
+
+            margin: 0 auto;
+
+        }
+
+
+
+        .dash-nav .logo {
+
+            font-family: "Space Grotesk", "Inter", sans-serif;
+
+            font-size: 1.25rem;
+
+            font-weight: 700;
+
+            color: #ededed;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+        }
+
+
+
+        .dash-nav .signal-rail {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+        }
+
+
+
+        .dash-nav .signal-rail span {
+
+            width: 8px;
+
+            height: 8px;
+
+            border-radius: 50%;
+
+            display: inline-block;
+
+        }
+
+
+
+        .dash-nav .signal-rail span:nth-child(1) {
+
+            background: #ef4444;
+
+            box-shadow: 0 0 8px rgba(239, 68, 68, .3);
+
+        }
+
+
+
+        .dash-nav .signal-rail span:nth-child(2) {
+
+            background: #f59e0b;
+
+            box-shadow: 0 0 8px rgba(245, 158, 11, .3);
+
+        }
+
+
+
+        .dash-nav .signal-rail span:nth-child(3) {
+
+            background: #10b981;
+
+            box-shadow: 0 0 8px rgba(16, 185, 129, .3);
+
+            animation: rail-pulse 2.2s ease-in-out infinite;
+
+        }
+
+
+
+        @keyframes rail-pulse {
+
+            0%, 100% { opacity: 1; }
+
+            50% { opacity: .35; }
+
+        }
+
+
+
+        .dashboard-container {
+
+            max-width: 1400px;
+
+            margin: 0 auto;
+
+            padding: 30px 24px 50px;
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+
+
+        .dashboard-container h1 {
+
+            font-family: "Space Grotesk", "Inter", sans-serif;
+
+            text-align: center;
+
+            color: #ededed;
+
+            font-size: 1.7rem;
+
+            margin: 0 0 8px;
+
+        }
+
+
+
+        .dashboard-subtitle {
+
+            text-align: center;
+
+            color: #a1a1aa;
+
+            font-family: "JetBrains Mono", monospace;
+
+            font-size: 0.85rem;
+
+            margin-bottom: 34px;
+
+        }
+
+
+
+        .traffic-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 22px;
+
+        }
+
+
+
+        .lane-container {
+
+            display: flex;
+
+            background: var(--surface);
+
+            backdrop-filter: blur(15px);
+
+            border-radius: 20px;
+
+            overflow: hidden;
+
+            border: 1px solid var(--border);
+
+            box-shadow: var(--card-glow);
+
+            position: relative;
+
+        }
+
+        .lane-container::before {
+
+            content: '';
+
+            position: absolute;
+
+            top: 0; left: 0; right: 0; height: 1px;
+
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+
+        }
+
+
+
+        /* --- Light Panel (Left Side) --- */
+
+        .light-panel {
+
+            background-color: transparent;
+
+            padding: 18px 16px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 16px;
+
+            border-right: 1px solid var(--border);
+
+            position: relative;
+
+            z-index: 2;
+
+        }
+
+
+
+        .light {
+
+            width: 46px;
+
+            height: 46px;
+
+            border-radius: 50%;
+
+            border: 2px solid rgba(0, 0, 0, 0.5);
+
+            transition: background-color 0.2s, box-shadow 0.2s;
+
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+
+            background-color: #262626; /* Default off */
+
+        }
+
+
+
+        /* "Off" states */
+
+        .light.red { background-color: #3a1414; }
+
+        .light.orange { background-color: #3a2c0e; }
+
+        .light.green { background-color: #123c26; }
+
+
+
+        /* "On" states */
+
+        .light.on.red {
+
+            background-color: #ef4444;
+
+            box-shadow: 0 0 25px var(--red), 0 0 60px rgba(244, 63, 94, 0.4), inset 0 0 8px rgba(255,255,255,0.3);
+
+        }
+
+        .light.on.orange {
+
+            background-color: #f59e0b;
+
+            box-shadow: 0 0 25px var(--amber), 0 0 60px rgba(245, 158, 11, 0.4), inset 0 0 8px rgba(255,255,255,0.3);
+
+        }
+
+        .light.on.green {
+
+            background-color: #10b981;
+
+            box-shadow: 0 0 25px var(--green), 0 0 60px rgba(16, 185, 129, 0.4), inset 0 0 8px rgba(255,255,255,0.3);
+
+        }
+
+
+
+        /* --- Video Box (Right Side) --- */
+
+        .video-box {
+
+            flex-grow: 1;
+
+            position: relative;
+
+            background-color: #000;
+
+            overflow: hidden;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+        }
+
+
+
+        /* Tactical corner brackets (muted for sleek look) */
+
+        .video-box::before, .video-box::after {
+
+            content: '';
+
+            position: absolute;
+
+            width: 100%; height: 100%;
+
+            pointer-events: none;
+
+            z-index: 3;
+
+        }
+
+        .video-box::before {
+
+            background: 
+
+                linear-gradient(to right, rgba(255,255,255,0.2) 2px, transparent 2px) 0 0,
+
+                linear-gradient(to bottom, rgba(255,255,255,0.2) 2px, transparent 2px) 0 0,
+
+                linear-gradient(to left, rgba(255,255,255,0.2) 2px, transparent 2px) 100% 0,
+
+                linear-gradient(to bottom, rgba(255,255,255,0.2) 2px, transparent 2px) 100% 0,
+
+                linear-gradient(to right, rgba(255,255,255,0.2) 2px, transparent 2px) 0 100%,
+
+                linear-gradient(to top, rgba(255,255,255,0.2) 2px, transparent 2px) 0 100%,
+
+                linear-gradient(to left, rgba(255,255,255,0.2) 2px, transparent 2px) 100% 100%,
+
+                linear-gradient(to top, rgba(255,255,255,0.2) 2px, transparent 2px) 100% 100%;
+
+            background-repeat: no-repeat;
+
+            background-size: 15px 15px;
+
+            opacity: 0.8;
+
+            margin: 10px;
+
+            width: calc(100% - 20px);
+
+            height: calc(100% - 20px);
+
+        }
+
+
+
+        .video-box img {
+
+            display: block;
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            filter: contrast(1.1) brightness(0.85);
+
+        }
+
+
+
+        .video-label {
+
+            position: absolute;
+
+            top: 15px;
+
+            left: 15px;
+
+            background: var(--surface);
+
+            backdrop-filter: blur(5px);
+
+            border: 1px solid rgba(255, 255, 255, 0.1);
+
+            color: #ededed;
+
+            padding: 5px 12px;
+
+            border-radius: 4px;
+
+            font-family: "JetBrains Mono", monospace;
+
+            font-size: 0.8rem;
+
+            font-weight: 700;
+
+            letter-spacing: 0.05em;
+
+            text-transform: uppercase;
+
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+            z-index: 4;
+
+        }
+
+
+
+        .stats-overlay {
+
+            position: absolute;
+
+            bottom: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+
+            color: #ededed;
+
+            padding: 30px 16px 14px;
+
+            box-sizing: border-box;
+
+            font-size: 0.92rem;
+
+            font-family: "JetBrains Mono", monospace;
+
+            display: flex;
+
+            gap: 18px;
+
+            flex-wrap: wrap;
+
+            z-index: 4;
+
+        }
+
+
+
+        .stats-overlay span {
+
+            font-weight: 700;
+
+            color: #10b981;
+
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
+
+        }
+
+
+
+        .stats-overlay #ambulance-1,
+
+        .stats-overlay #ambulance-2,
+
+        .stats-overlay #ambulance-3,
+
+        .stats-overlay #ambulance-4 {
+
+            color: #ffb020;
+
+            /* Yellow for ambulance status */
+
+        }
+
+
+
+        /* --- Controls (Bottom Buttons) --- */
+
+        .controls {
+
+            text-align: center;
+
+            padding: 34px 0 10px 0;
+
+            display: flex;
+
+            gap: 16px;
+
+            justify-content: center;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        /* --- Responsive for smaller screens --- */
+
+        @media (max-width: 900px) {
+
+            .traffic-grid {
+
+                grid-template-columns: 1fr;
+
+                /* Stack to 1 column */
+
+            }
+
+
+
+            .light {
+
+                width: 38px;
+
+                height: 38px;
+
+            }
+
+
+
+            .dash-nav {
+
+                padding: 1rem 1.25rem;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body>
+
+    <nav class="dash-nav">
+
+        <div class="nav-container">
+
+            <div class="logo">
+
+                <span class="signal-rail"><span></span><span></span><span></span></span>
+
+                <span class="brand-title">STMS</span>
+
+                <span class="live-telemetry-badge">
+
+                    <span class="live-dot"></span> LIVE
+
+                </span>
+
+            </div>
+
+            <div class="nav-hud-group">
+
+                <a href="{{ url_for('upload_page') }}" class="nav-pill-btn">
+
+                    <span class="nav-icon-orb cyan">📡</span>
+
+                    <span>Cameras</span>
+
+                </a>
+
+                <a href="{{ url_for('analysis_page') }}" class="nav-pill-btn">
+
+                    <span class="nav-icon-orb emerald">📊</span>
+
+                    <span>Analytics</span>
+
+                </a>
+
+                <a href="{{ url_for('challans') }}" class="nav-pill-btn alert">
+
+                    <span class="nav-icon-orb red">
+
+                        <span class="radar-pulse-dot" style="position: absolute; top: -2px; right: -2px;"></span>
+
+                        🚨
+
+                    </span>
+
+                    <span>E-Challans</span>
+
+                </a>
+
+                <a href="{{ url_for('home') }}" class="nav-pill-btn">
+
+                    <span class="nav-icon-orb blue">🏠</span>
+
+                    <span>Home</span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <div class="dashboard-container">
+
+        <h1>Live Intersection Feed</h1>
+
+        <p class="dashboard-subtitle">Real-time surveillance &middot; dynamic signal actuation</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div style="margin: 20px 0 16px;">
+                    {% for category, message in messages %}
+                        <div style="padding: 12px 18px; border-radius: 12px; font-size: 0.88rem; font-family: var(--font-mono); text-align: center; margin-bottom: 8px; {% if category == 'success' %}background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399;{% elif category == 'info' %}background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8;{% else %}background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444;{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Cyber Feed Control Toolbar -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 20px 0 24px; padding: 14px 22px; background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; flex-wrap: wrap; gap: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); padding: 5px 12px; border-radius: 999px; letter-spacing: 0.05em;">
+                    ● FEED CONTROL
+                </span>
+                <span style="font-size: 0.84rem; color: #94a3b8; font-family: 'Inter', sans-serif;">
+                    Configure active camera streams, upload sector footage, or run pre-recorded simulation
+                </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <a href="{{ url_for('load_demo_videos') }}" class="button primary" style="padding: 9px 18px; font-size: 0.82rem; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #059669, #0d9488); border: 1px solid rgba(16, 185, 129, 0.4); color: #fff; font-weight: 600;">
+                    <span>▶️ Load Demo Simulation Feeds</span>
+                </a>
+                <a href="{{ url_for('upload_page') }}" class="button secondary" style="padding: 9px 18px; font-size: 0.82rem; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.14); color: #e2e8f0; font-weight: 600;">
+                    <span>📁 Upload / Connect Cameras</span>
+                </a>
+                <a href="{{ url_for('clear_feeds') }}" class="button secondary" style="padding: 9px 18px; font-size: 0.82rem; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; font-weight: 600;">
+                    <span>⏹️ Clear Feeds / Standby</span>
+                </a>
+            </div>
+        </div>
+
+
+
+
+        <!-- Emergency Priority Override Alert Banner -->
+
+        <div id="emergency-banner" class="emergency-override-banner">
+
+            <div style="display: flex; align-items: center; gap: 14px;">
+
+                <span style="font-size: 1.6rem;">🚨</span>
+
+                <div>
+
+                    <div style="font-size: 1.05rem; text-transform: uppercase;">Emergency Vehicle Priority Override Active</div>
+
+                    <div id="emergency-banner-text" style="font-size: 0.82rem; opacity: 0.95; font-family: var(--font-mono); margin-top: 2px;">Holding Green Corridor for Ambulance</div>
+
+                </div>
+
+            </div>
+
+            <button onclick="toggleAudioAlert()" id="sound-toggle-btn" class="button secondary" style="padding: 7px 16px; font-size: 0.82rem; background: rgba(0,0,0,0.35); border-color: rgba(255,255,255,0.4); color: #fff;">
+
+                🔊 Audio Alert: ON
+
+            </button>
+
+        </div>
+
+
+
+        <div class="traffic-grid">
+
+
+
+            <div class="lane-container">
+
+                <div class="light-panel" id="light-panel-1">
+
+                    <div class="light red" id="light-1-red"></div>  
+
+                    <div class="light orange" id="light-1-orange"></div>
+
+                    <div class="light green" id="light-1-green"></div>
+
+                </div> 
+
+                <div class="video-box">   
+
+                    <img src="{{ url_for('video_feed', lane_id=1) }}" width="100%">
+
+                    <div class="video-label">Lane 1</div>
+
+                    <div class="video-hud-tools">
+
+                        <button class="hud-tool-btn" onclick="takeSnapshot(1)" title="📸 Capture Snapshot">📸</button>
+
+                        <button class="hud-tool-btn" onclick="openFocusModal(1)" title="⛶ Focus / Maximize">⛶</button>
+
+                    </div>
+
+                    <div class="stats-overlay">
+
+                        Density: <span id="density-1">0</span> | Ambulance: <span id="ambulance-1">No</span> | Time:
+
+                        <span id="timer-1">--</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="lane-container">
+
+                <div class="light-panel" id="light-panel-4">
+
+                    <div class="light red" id="light-4-red"></div>
+
+                    <div class="light orange" id="light-4-orange"></div>
+
+                    <div class="light green" id="light-4-green"></div>
+
+                </div>
+
+                <div class="video-box">
+
+                    <img src="{{ url_for('video_feed', lane_id=4) }}" width="100%">
+
+                    <div class="video-label">Lane 4</div>
+
+                    <div class="video-hud-tools">
+
+                        <button class="hud-tool-btn" onclick="takeSnapshot(4)" title="📸 Capture Snapshot">📸</button>
+
+                        <button class="hud-tool-btn" onclick="openFocusModal(4)" title="⛶ Focus / Maximize">⛶</button>
+
+                    </div>
+
+                    <div class="stats-overlay">
+
+                        Density: <span id="density-4">0</span> | Ambulance: <span id="ambulance-4">No</span> | Time:
+
+                        <span id="timer-4">--</span>
+
+                    </div>
+
+                </div>    
+
+            </div>
+
+
+
+            <div class="lane-container">
+
+                <div class="light-panel" id="light-panel-2">
+
+                    <div class="light red" id="light-2-red"></div>
+
+                    <div class="light orange" id="light-2-orange"></div>
+
+                    <div class="light green" id="light-2-green"></div>
+
+                </div>
+
+                <div class="video-box">
+
+                    <img src="{{ url_for('video_feed', lane_id=2) }}" width="100%">
+
+                    <div class="video-label">Lane 2</div>
+
+                    <div class="video-hud-tools">
+
+                        <button class="hud-tool-btn" onclick="takeSnapshot(2)" title="📸 Capture Snapshot">📸</button>
+
+                        <button class="hud-tool-btn" onclick="openFocusModal(2)" title="⛶ Focus / Maximize">⛶</button>
+
+                    </div>
+
+                    <div class="stats-overlay">
+
+                        Density: <span id="density-2">0</span> | Ambulance: <span id="ambulance-2">No</span> | Time:
+
+                        <span id="timer-2">--</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="lane-container">
+
+                <div class="light-panel" id="light-panel-3">
+
+                    <div class="light red" id="light-3-red"></div>
+
+                    <div class="light orange" id="light-3-orange"></div>
+
+                    <div class="light green" id="light-3-green"></div>
+
+                </div>
+
+                <div class="video-box">
+
+                    <img src="{{ url_for('video_feed', lane_id=3) }}" width="100%">
+
+                    <div class="video-label">Lane 3</div>
+
+                    <div class="video-hud-tools">
+
+                        <button class="hud-tool-btn" onclick="takeSnapshot(3)" title="📸 Capture Snapshot">📸</button>
+
+                        <button class="hud-tool-btn" onclick="openFocusModal(3)" title="⛶ Focus / Maximize">⛶</button>
+
+                    </div>
+
+                    <div class="stats-overlay">
+
+                        Density: <span id="density-3">0</span> | Ambulance: <span id="ambulance-3">No</span> | Time:
+
+                        <span id="timer-3">--</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+        </div>
+
+
+
+        <!-- Police Officer Manual Signal Override Deck -->
+
+        <div class="manual-override-panel">
+
+            <div class="override-title">
+
+                <span style="font-size: 1.4rem;">👮</span>
+
+                <div>
+
+                    <span style="letter-spacing: 0.02em;">Officer Signal Override Deck</span>
+
+                    <div style="font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px;">Immediately grant Green corridor to any lane</div>
+
+                </div>
+
+            </div>
+
+            <div class="override-btn-group">
+
+                <button type="button" class="override-lane-btn" onclick="forceLane(1)">🟢 Force Lane 1</button>
+
+                <button type="button" class="override-lane-btn" onclick="forceLane(2)">🟢 Force Lane 2</button>
+
+                <button type="button" class="override-lane-btn" onclick="forceLane(3)">🟢 Force Lane 3</button>
+
+                <button type="button" class="override-lane-btn" onclick="forceLane(4)">🟢 Force Lane 4</button>
+
+                <button type="button" class="override-lane-btn" onclick="triggerTestViolation(1)" style="border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.16); color: #fca5a5;" title="Simulate a vehicle jumping red light for live testing">🚨 Trigger Test Violation</button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="controls">
+
+            <a href="{{ url_for('analysis_page') }}" class="button primary">
+
+                <span>📊 View Analysis</span>
+
+                <span class="btn-arrow">&rarr;</span>
+
+            </a>
+
+            <a href="{{ url_for('upload_page') }}" class="button secondary">
+
+                <span>📡 Configure Cameras</span>
+
+            </a>
+
+            <a href="{{ url_for('challans') }}" class="button danger">
+
+                <span class="radar-pulse-dot"></span>
+
+                <span>🚨 E-Challan Records</span>
+
+            </a>
+
+            <a href="/" class="button secondary" style="border-color: rgba(255,255,255,0.08);">
+
+                <span>🏠 Back to Home</span>
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        /**
+
+         * Updates the HTML elements (lights, text, timer) for a specific lane.
+
+         */
+
+        function updateUI(laneId, status, density, ambulance, timeRemaining) {
+
+            // Update Text Stats
+
+            document.getElementById(`density-${laneId}`).innerText = density;
+
+            const ambulanceEl = document.getElementById(`ambulance-${laneId}`);
+
+            ambulanceEl.innerText = ambulance ? 'YES!' : 'No';
+
+            ambulanceEl.style.color = ambulance ? '#ff0000' : '#ffc107'; // Red if YES
+
+            ambulanceEl.style.fontWeight = ambulance ? 'bold' : 'normal';
+
+
+
+
+
+            // Update Timer
+
+            const timerElement = document.getElementById(`timer-${laneId}`);
+
+            if (timeRemaining !== undefined && timeRemaining >= 0) {
+
+                timerElement.innerText = Math.round(timeRemaining); // Round to whole number
+
+            } else {
+
+                timerElement.innerText = '--';
+
+            }
+
+
+
+            // Update Traffic Lights
+
+            const redLight = document.getElementById(`light-${laneId}-red`);
+
+            const orangeLight = document.getElementById(`light-${laneId}-orange`);
+
+            const greenLight = document.getElementById(`light-${laneId}-green`);
+
+
+
+            // Turn all lights off first
+
+            redLight.classList.remove('on');
+
+            orangeLight.classList.remove('on');
+
+            greenLight.classList.remove('on');
+
+
+
+            // Turn the correct one on
+
+            if (status === 'red') {
+
+                redLight.classList.add('on');
+
+            } else if (status === 'green') {
+
+                greenLight.classList.add('on');
+
+            } else if (status === 'orange') {
+
+                orangeLight.classList.add('on');
+
+            }
+
+        }
+
+
+
+        /**
+
+         * Fetches the latest system state from the Flask '/status_api' endpoint
+
+         * and updates the UI for all four lanes.
+
+         */
+
+        async function fetchStatus() {
+
+            try {
+
+                const response = await fetch('/status_api');
+
+                if (!response.ok) {
+
+                    throw new Error(`HTTP error! status: ${response.status}`);
+
+                }
+
+                const data = await response.json();
+
+
+
+                let activeAmbulanceLane = null;
+
+                for (let i = 1; i <= 4; i++) {
+
+                    if (data[i]) {
+
+                        const lane = data[i];
+
+                        updateUI(i, lane.status, lane.density, lane.ambulance, lane.time_remaining);
+
+                        if (lane.ambulance) {
+
+                            activeAmbulanceLane = i;
+
+                        }
+
+                    }
+
+                }
+
+                const banner = document.getElementById('emergency-banner');
+
+                const bannerText = document.getElementById('emergency-banner-text');
+
+                if (activeAmbulanceLane !== null) {
+
+                    banner.style.display = 'flex';
+
+                    bannerText.innerText = `Emergency Corridor Locked on Lane ${activeAmbulanceLane} (Holding Green Signal)`;
+
+                    playTacticalBeep(750, 0.18);
+
+                } else {
+
+                    banner.style.display = 'none';
+
+                }
+
+
+
+            } catch (error) {
+
+                console.error("Error fetching status:", error);
+
+            }
+
+        }
+
+
+
+        // Poll the API every 1 second (1000 milliseconds)
+
+        setInterval(fetchStatus, 1000);
+
+
+
+        // Run the function once immediately on page load
+
+        fetchStatus();
+
+    
+
+        // --- 6. Manual / Demo Violation Trigger ---
+
+        async function triggerTestViolation(laneId = 1) {
+
+            playTacticalBeep(1200, 0.2);
+
+            showToast(`🚨 Simulating Red-Light Violation on Lane ${laneId}...`, 'info');
+
+            try {
+
+                const res = await fetch('/api/trigger_violation', {
+
+                    method: 'POST',
+
+                    headers: {'Content-Type': 'application/json'},
+
+                    body: JSON.stringify({ lane_id: laneId })
+
+                });
+
+                const data = await res.json();
+
+                if (data.success && data.alert) {
+
+                    showViolationToast({
+
+                        lane: laneId,
+
+                        vehicle: data.alert.vehicle || 'Car',
+
+                        plate: data.alert.plate || 'MH12-RN-0001',
+
+                        time: data.alert.time || new Date().toTimeString().split(' ')[0]
+
+                    });
+
+                    showToast(`✅ E-Challan recorded: ${data.alert.plate} (Lane ${laneId})`, 'success');
+
+                } else {
+
+                    showToast(`Notice: ${data.error || 'Trigger completed'}`, 'info');
+
+                }
+
+            } catch (e) {
+
+                console.error("Test violation error:", e);
+
+                showToast("Failed to trigger violation: " + e.message, 'info');
+
+            }
+
+        }
+
+
+
+    </script>
+
+    <footer class="app-footer">
+
+        <div class="footer-content">
+
+            <div class="footer-logo">
+
+                <span class="signal-rail"><span></span><span></span><span></span></span>
+
+                STMS
+
+            </div>
+
+            <div class="footer-text">
+
+                &copy; 2026 Smart Traffic Management System. All rights reserved.
+
+            </div>
+
+        </div>
+
+    </footer>
+
+    <!-- Fullscreen Feed Focus Modal -->
+
+    <div id="focus-modal" class="feed-focus-modal" onclick="closeFocusModal(event)">
+
+        <div class="feed-focus-content" onclick="event.stopPropagation()">
+
+            <div class="modal-header">
+
+                <div style="display: flex; align-items: center; gap: 10px;">
+
+                    <span id="modal-lane-title" style="font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: #ededed;">Lane Focus Feed</span>
+
+                    <span class="live-telemetry-badge"><span class="live-dot"></span> LIVE HD</span>
+
+                </div>
+
+                <button class="modal-close-btn" onclick="closeFocusModal()">&times;</button>
+
+            </div>
+
+            <div style="position: relative; background: #000; text-align: center;">
+
+                <img id="modal-feed-img" src="" style="width: 100%; max-height: 72vh; object-fit: contain; display: block;">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Live ANPR Violation Toast Container -->
+
+    <div id="toast-container" class="violation-toast-container"></div>
+
+
+
+    <script src="{{ url_for('static', filename='js/interactive.js') }}"></script>
+
+    <script>
+
+        // --- 1. Sound & Audio Synthesizer (Web Audio API) ---
+
+        let audioAlertEnabled = true;
+
+        let audioCtx = null;
+
+
+
+        function getAudioContext() {
+
+            if (!audioCtx) {
+
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+            }
+
+            return audioCtx;
+
+        }
+
+
+
+        function toggleAudioAlert() {
+
+            audioAlertEnabled = !audioAlertEnabled;
+
+            const btn = document.getElementById('sound-toggle-btn');
+
+            if (btn) {
+
+                btn.innerText = audioAlertEnabled ? '🔊 Audio Alert: ON' : '🔇 Audio Alert: MUTED';
+
+                btn.style.opacity = audioAlertEnabled ? '1' : '0.6';
+
+            }
+
+        }
+
+
+
+        function playTacticalBeep(freq = 880, duration = 0.12) {
+
+            if (!audioAlertEnabled) return;
+
+            try {
+
+                const ctx = getAudioContext();
+
+                if (ctx.state === 'suspended') ctx.resume();
+
+                const osc = ctx.createOscillator();
+
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+                osc.connect(gain);
+
+                gain.connect(ctx.destination);
+
+                osc.start();
+
+                osc.stop(ctx.currentTime + duration);
+
+            } catch (e) {}
+
+        }
+
+
+
+        // --- 2. Live Feed Snapshot Feature (Instant Capture) ---
+
+        function takeSnapshot(laneId) {
+
+            playTacticalBeep(1200, 0.08);
+
+            const img = document.querySelector(`#density-${laneId}`).closest('.lane-container').querySelector('.video-box img');
+
+            if (!img) return;
+
+
+
+            const canvas = document.createElement('canvas');
+
+            canvas.width = img.naturalWidth || 640;
+
+            canvas.height = img.naturalHeight || 360;
+
+            const ctx = canvas.getContext('2d');
+
+            try {
+
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                
+
+                // Add Watermark
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+
+                ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
+
+                ctx.fillStyle = '#10b981';
+
+                ctx.font = 'bold 14px "JetBrains Mono", monospace';
+
+                const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+                ctx.fillText(`STMS SURVEILLANCE | LANE ${laneId} | CAPTURED: ${now}`, 15, canvas.height - 10);
+
+
+
+                const link = document.createElement('a');
+
+                link.download = `STMS_Lane_${laneId}_${Date.now()}.jpg`;
+
+                link.href = canvas.toDataURL('image/jpeg', 0.92);
+
+                link.click();
+
+            } catch (e) {
+
+                // If cross-origin or video stream canvas draw blocked, fallback to open feed in new tab
+
+                window.open(img.src, '_blank');
+
+            }
+
+        }
+
+
+
+        // --- 3. Fullscreen Focus Modal ---
+
+        function openFocusModal(laneId) {
+
+            playTacticalBeep(950, 0.08);
+
+            const modal = document.getElementById('focus-modal');
+
+            const title = document.getElementById('modal-lane-title');
+
+            const feedImg = document.getElementById('modal-feed-img');
+
+            title.innerText = `Lane ${laneId} Surveillance Feed & Actuation`;
+
+            feedImg.src = `/video_feed/${laneId}`;
+
+            modal.style.display = 'flex';
+
+        }
+
+
+
+        function closeFocusModal(event) {
+
+            const modal = document.getElementById('focus-modal');
+
+            const feedImg = document.getElementById('modal-feed-img');
+
+            if (modal) modal.style.display = 'none';
+
+            if (feedImg) feedImg.src = '';
+
+        }
+
+
+
+        // Close modal on Escape key
+
+        document.addEventListener('keydown', function (e) {
+
+            if (e.key === 'Escape' || e.key === 'Esc') {
+
+                closeFocusModal();
+
+            }
+
+        });
+
+
+
+        // --- 4. Officer Manual Signal Override API ---
+
+        async function forceLane(laneId) {
+
+            playTacticalBeep(1100, 0.15);
+
+            try {
+
+                const res = await fetch('/api/force_lane', {
+
+                    method: 'POST',
+
+                    headers: { 'Content-Type': 'application/json' },
+
+                    body: JSON.stringify({ lane_id: laneId })
+
+                });
+
+                const data = await res.json();
+
+                if (data.status === 'success') {
+
+                    showToast(`👮 Officer Override Granted: Lane ${laneId} Green`, 'success');
+
+                    fetchStatus();
+
+                }
+
+            } catch (e) {
+
+                console.error("Force lane error:", e);
+
+            }
+
+        }
+
+
+
+        // --- 5. Real-Time Violation Toast Notifications ---
+
+        let lastSeenViolationTime = '';
+
+        async function checkRecentViolations() {
+
+            try {
+
+                const res = await fetch('/api/recent_violations');
+
+                const data = await res.json();
+
+                if (data && data.violations && data.violations.length > 0) {
+
+                    const latest = data.violations[data.violations.length - 1];
+
+                    if (latest.time !== lastSeenViolationTime) {
+
+                        lastSeenViolationTime = latest.time;
+
+                        showViolationToast(latest);
+
+                        playTacticalBeep(600, 0.25);
+
+                    }
+
+                }
+
+            } catch (e) {}
+
+        }
+
+        setInterval(checkRecentViolations, 2500);
+
+
+
+        function showViolationToast(v) {
+
+            const container = document.getElementById('toast-container');
+
+            if (!container) return;
+
+            const toast = document.createElement('div');
+
+            toast.className = 'violation-toast';
+
+            toast.innerHTML = `
+
+                <span style="font-size: 1.5rem;">🚨</span>
+
+                <div style="flex-grow: 1;">
+
+                    <div style="font-weight: 700; font-size: 0.92rem; color: #fda4af;">VIOLATION RECORDED</div>
+
+                    <div style="font-size: 0.78rem; font-family: var(--font-mono); color: #ededed;">
+
+                        Lane ${v.lane} &middot; ${v.vehicle} &middot; <strong style="color: #facc15;">${v.plate}</strong>
+
+                    </div>
+
+                </div>
+
+                <a href="/challans" class="violation-toast-btn">View Ticket &rarr;</a>
+
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+
+                toast.style.transition = 'all 0.4s ease';
+
+                toast.style.opacity = '0';
+
+                toast.style.transform = 'translateY(20px)';
+
+                setTimeout(() => toast.remove(), 400);
+
+            }, 6000);
+
+        }
+
+
+
+        function showToast(msg, type = 'info') {
+
+            const container = document.getElementById('toast-container');
+
+            if (!container) return;
+
+            const toast = document.createElement('div');
+
+            toast.className = 'violation-toast';
+
+            toast.style.borderColor = type === 'success' ? '#10b981' : '#38bdf8';
+
+            toast.style.boxShadow = type === 'success' ? '0 0 15px rgba(16, 185, 129, 0.4)' : '0 0 15px rgba(56, 189, 248, 0.4)';
+
+            toast.innerHTML = `
+
+                <span style="font-size: 1.2rem;">${type === 'success' ? '✅' : 'ℹ️'}</span>
+
+                <div style="font-size: 0.85rem; font-family: var(--font-mono); color: #ededed;">${msg}</div>
+
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+
+                toast.style.opacity = '0';
+
+                setTimeout(() => toast.remove(), 300);
+
+            }, 3500);
+
+        }
+
+
+
+    </script>
+
+</body>
+
+
+
+</html>

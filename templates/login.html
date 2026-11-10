@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Login - Smart Traffic Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.7">
+    <style>
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px rgba(10, 15, 30, 0.95) inset !important;
+            -webkit-text-fill-color: #ededed !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+    </style>
+</head>
+<body>
+    <div class="split-layout">
+        <!-- Left Visual Side: Cyber Command HUD Showcase -->
+        <div class="split-image">
+            <div class="split-visual-content">
+                <div>
+                    <div class="split-hud-badge">
+                        <span class="signal-rail"><span></span><span></span><span></span></span>
+                        <span>STMS &bull; AUTONOMOUS INTERSECTION CORE</span>
+                    </div>
+                </div>
+
+                <div class="split-radar-center">
+                    <h1>Intelligent Traffic Command</h1>
+                    <p>Real-time computer vision perception, dynamic green-wave optimization, and automated enforcement platform.</p>
+                    <div class="split-telemetry-chips">
+                        <div class="split-chip"><span class="split-chip-dot green"></span> YOLOv8 Vision AI</div>
+                        <div class="split-chip"><span class="split-chip-dot cyan"></span> Quad-Lane 1080P</div>
+                        <div class="split-chip"><span class="split-chip-dot amber"></span> ESP32 Microcontroller</div>
+                        <div class="split-chip"><span class="split-chip-dot green"></span> ANPR OCR Active</div>
+                    </div>
+                </div>
+
+                <div class="split-bottom-quote">
+                    <span>🛡️ End-to-End Encrypted Personnel Access</span>
+                    <span>&bull;</span>
+                    <span>v3.7 Multi-Theme</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Form Side: Glassmorphic Cyber Portal -->
+        <div class="split-form-wrapper">
+            <div class="split-form-box">
+                <div class="split-header-row">
+                    <div class="split-brand-lockup">
+                        <span class="signal-rail"><span></span><span></span><span></span></span>
+                        <span>STMS</span>
+                    </div>
+                    <div class="split-status-pill">
+                        <span class="live-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                        OPERATOR PORTAL
+                    </div>
+                </div>
+                
+                <h2>Welcome Back</h2>
+                <p class="subtext">Enter your credentials to access live traffic telemetry and junction controls.</p>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="/" method="POST" autocomplete="off">
+                    <div class="input-field-wrap">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="username" name="username" placeholder="Operator Username" required autocomplete="off">
+                    </div>
+                    
+                    <div class="input-field-wrap">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="password" name="password" placeholder="Password" required autocomplete="new-password">
+                        <button type="button" class="pwd-toggle-btn" id="togglePwdBtn" title="Toggle password visibility">👁️</button>
+                    </div>
+
+                    <button type="submit" class="button submit-btn">
+                        <span>Authorize Access</span>
+                        <span class="btn-arrow">&rarr;</span>
+                    </button>
+                </form>
+
+                <div class="auth-footer-nav">
+                    Don't have operator clearance? <br>
+                    <a href="{{ url_for('register') }}">Register New Operator Account</a>
+                </div>
+                
+                <div class="auth-back-home">
+                    <a href="{{ url_for('home') }}" class="auth-back-btn">
+                        <span>&larr;</span>
+                        <span>Back to Public Overview</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI/UX Theme & Ripple Engine -->
+    <script src="{{ url_for('static', filename='js/interactive.js') }}"></script>
+    <script>
+        // Password visibility toggle
+        const toggleBtn = document.getElementById('togglePwdBtn');
+        const pwdInput = document.getElementById('password');
+        if (toggleBtn && pwdInput) {
+            toggleBtn.addEventListener('click', () => {
+                const isPassword = pwdInput.type === 'password';
+                pwdInput.type = isPassword ? 'text' : 'password';
+                toggleBtn.textContent = isPassword ? '🙈' : '👁️';
+            });
+        }
+    </script>
+</body>
+</html>

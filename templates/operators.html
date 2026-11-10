@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Control Management - STMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================================================
+           ADVANCED CYBERNETIC ACCESS CONTROL & OPERATOR MANAGEMENT HUD
+           ========================================================================= */
+        :root {
+            --glow-cyan: rgba(56, 189, 248, 0.5);
+            --glow-emerald: rgba(16, 185, 129, 0.5);
+            --glow-amber: rgba(245, 158, 11, 0.5);
+            --glow-rose: rgba(244, 63, 94, 0.5);
+            --glass-bg: rgba(15, 23, 42, 0.72);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-bright: rgba(245, 158, 11, 0.35);
+        }
+
+        body {
+            background-color: #070b14 !important;
+            color: #f1f5f9;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Ambient Cyber Grid & Glow Orbs */
+        .ambient-mesh-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .ambient-mesh-canvas::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(245, 158, 11, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(245, 158, 11, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.6;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(130px);
+            opacity: 0.35;
+            animation: orbFloat 18s ease-in-out infinite alternate;
+        }
+
+        .ambient-orb-1 {
+            width: 520px;
+            height: 520px;
+            top: -100px;
+            right: 10%;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, transparent 70%);
+        }
+
+        .ambient-orb-2 {
+            width: 550px;
+            height: 550px;
+            top: 30%;
+            left: -100px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.35) 0%, transparent 70%);
+            animation-duration: 22s;
+        }
+
+        .ambient-orb-3 {
+            width: 450px;
+            height: 450px;
+            bottom: -50px;
+            right: 25%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, transparent 70%);
+            animation-duration: 16s;
+        }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-30px, 25px) scale(1.08); }
+            100% { transform: translate(25px, -35px) scale(0.95); }
+        }
+
+        /* Top HUD Navigation */
+        .top-nav {
+            background: rgba(10, 15, 29, 0.78) !important;
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.9rem 2.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .brand-cluster {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .signal-rail {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .signal-rail span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .signal-rail span:nth-child(1) {
+            background: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+        }
+
+        .signal-rail span:nth-child(2) {
+            background: #f59e0b;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
+            animation: pulseSignal 2s infinite ease-in-out;
+        }
+
+        .signal-rail span:nth-child(3) {
+            background: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+        }
+
+        @keyframes pulseSignal {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        .brand-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-admin-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.05em;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+        }
+
+        .admin-pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #fbbf24;
+            box-shadow: 0 0 8px #fbbf24;
+            animation: pulseSignal 1.5s infinite;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 7px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-btn:hover {
+            color: #ffffff;
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.home-btn {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+        }
+
+        .nav-btn.home-btn:hover {
+            background: rgba(56, 189, 248, 0.22);
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .nav-btn.logout-btn {
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .nav-btn.logout-btn:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+            color: #ffffff;
+        }
+
+        /* Main Viewport Container */
+        .operators-viewport {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 36px 24px 80px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero Header */
+        .hud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .hud-header-left {
+            max-width: 780px;
+        }
+
+        .hud-badge-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #fbbf24;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.28);
+            padding: 5px 12px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .hud-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin: 0 0 8px 0;
+            line-height: 1.15;
+            background: linear-gradient(135deg, #ffffff 40%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hud-desc {
+            font-size: 0.92rem;
+            color: #94a3b8;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .hud-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .session-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 8px 16px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        }
+
+        .session-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulseSignal 1.8s infinite;
+        }
+
+        /* KPI Security Metric Bento Ribbon */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .kpi-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 20px 22px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--card-accent, #38bdf8), transparent);
+            opacity: 0.6;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px var(--card-glow, rgba(56, 189, 248, 0.2));
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .kpi-icon-orb {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .kpi-icon-orb.amber {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+        }
+
+        .kpi-icon-orb.cyan {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+        }
+
+        .kpi-icon-orb.emerald {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        }
+
+        .kpi-trend-chip {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+        }
+
+        .kpi-trend-chip.amber {
+            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.25);
+        }
+
+        .kpi-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1;
+            margin-bottom: 6px;
+            letter-spacing: -0.03em;
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .kpi-subtext {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: #64748b;
+        }
+
+        /* Glass Bento Table Card */
+        .bento-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px 26px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 28px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.35), transparent);
+        }
+
+        .bento-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .bento-title-cluster {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bento-bullet {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            background: #f59e0b;
+            box-shadow: 0 0 10px #f59e0b;
+        }
+
+        .bento-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .bento-subtitle {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            margin-left: 22px;
+        }
+
+        .bento-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        /* Tactical Table Styling */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(10, 15, 29, 0.55);
+        }
+
+        .cyber-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            text-align: left;
+        }
+
+        .cyber-table th {
+            background: rgba(255, 255, 255, 0.03);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            white-space: nowrap;
+        }
+
+        .cyber-table td {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #e2e8f0;
+            vertical-align: middle;
+            transition: background 0.2s;
+        }
+
+        .cyber-table tbody tr:hover td {
+            background: rgba(245, 158, 11, 0.04);
+        }
+
+        .id-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .user-identity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar-pip {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+        }
+
+        .user-avatar-pip.admin {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .user-name-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .user-email-text {
+            color: #94a3b8;
+            font-size: 0.86rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .role-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .role-pill.admin {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.18);
+        }
+
+        .role-pill.operator {
+            background: rgba(56, 189, 248, 0.12);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .role-pip {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 6px currentColor;
+        }
+
+        .status-active-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.74rem;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 3px 10px;
+            border-radius: 6px;
+        }
+
+        /* Bottom Command & Quick Action Bar */
+        .command-bar {
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .command-bar-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .command-bar-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #fbbf24;
+        }
+
+        .command-bar-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 2px 0;
+        }
+
+        .command-bar-desc {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin: 0;
+        }
+
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-cyber {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-cyber.home {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.2));
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .btn-cyber.home:hover {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(14, 165, 233, 0.35));
+            border-color: #38bdf8;
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-cyber.primary {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-cyber.primary:hover {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-color: #fbbf24;
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
+        }
+
+        .btn-cyber.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        .btn-cyber.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: #ffffff;
+        }
+
+        /* App Footer */
+        .app-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 24px;
+            text-align: center;
+            background: #040810;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .footer-text {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Ambient Cyber Glow Canvas -->
+    <div class="ambient-mesh-canvas">
+        <div class="ambient-orb ambient-orb-1"></div>
+        <div class="ambient-orb ambient-orb-2"></div>
+        <div class="ambient-orb ambient-orb-3"></div>
+    </div>
+
+    <!-- Top HUD Navigation -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="brand-cluster">
+                <span class="signal-rail">
+                    <span></span><span></span><span></span>
+                </span>
+                <a href="{{ url_for('home') }}" class="brand-title">STMS</a>
+                <span class="nav-admin-badge">
+                    <span class="admin-pulse-dot"></span> ADMIN ACCESS
+                </span>
+            </div>
+
+            <div class="nav-actions">
+                <a href="{{ url_for('home') }}" class="nav-btn home-btn">
+                    <span>🏠 Home</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="nav-btn">
+                    <span>🚦 Live Feeds</span>
+                </a>
+                <a href="{{ url_for('analysis_page') }}" class="nav-btn">
+                    <span>📊 Analytics</span>
+                </a>
+                <a href="{{ url_for('challans') }}" class="nav-btn">
+                    <span>🚨 E-Challans</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-btn logout-btn">
+                    <span>🚪 Logout</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Viewport -->
+    <main class="operators-viewport">
+
+        <!-- Hero Header -->
+        <header class="hud-header">
+            <div class="hud-header-left">
+                <div class="hud-badge-tag">
+                    <span>🛡️ ROLE-BASED ACCESS CONTROL (RBAC)</span>
+                    <span>•</span>
+                    <span>SECURITY CLEARANCE</span>
+                </div>
+                <h1 class="hud-title">Access Control Management</h1>
+                <p class="hud-desc">
+                    Authorized operators, administrators, and cryptographic security credentials for STMS traffic intersection orchestration.
+                </p>
+            </div>
+            <div class="hud-header-right">
+                <div class="session-badge">
+                    <span class="session-dot"></span>
+                    <span>Active Session: <strong>{{ session.username }}</strong></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI Security Metrics Bento Ribbon -->
+        <section class="kpi-grid">
+            <!-- Metric 1: Total Users -->
+            <div class="kpi-card" style="--card-accent: #38bdf8; --card-glow: rgba(56, 189, 248, 0.35);">
+                <div class="kpi-top">
+                    <div class="kpi-icon-orb cyan">👥</div>
+                    <span class="kpi-trend-chip positive">Active Directory</span>
+                </div>
+                <div>
+                    <div class="kpi-val">{{ users|length }}</div>
+                    <div class="kpi-label">Registered Accounts</div>
+                    <div class="kpi-subtext">Total authenticated operators</div>
+                </div>
+            </div>
+
+            <!-- Metric 2: Administrators -->
+            {% set admin_count = namespace(total=0) %}
+            {% for u in users %}
+                {% if u.role == 'admin' %}
+                    {% set admin_count.total = admin_count.total + 1 %}
+                {% endif %}
+            {% endfor %}
+            <div class="kpi-card" style="--card-accent: #f59e0b; --card-glow: rgba(245, 158, 11, 0.35);">
+                <div class="kpi-top">
+                    <div class="kpi-icon-orb amber">🛡️</div>
+                    <span class="kpi-trend-chip amber">Full Authority</span>
+                </div>
+                <div>
+                    <div class="kpi-val">{{ admin_count.total }}</div>
+                    <div class="kpi-label">System Administrators</div>
+                    <div class="kpi-subtext">Root intersection override privilege</div>
+                </div>
+            </div>
+
+            <!-- Metric 3: Security Status -->
+            <div class="kpi-card" style="--card-accent: #10b981; --card-glow: rgba(16, 185, 129, 0.35);">
+                <div class="kpi-top">
+                    <div class="kpi-icon-orb emerald">🔒</div>
+                    <span class="kpi-trend-chip positive">SHA-256 / Bcrypt</span>
+                </div>
+                <div>
+                    <div class="kpi-val" style="font-size: 1.8rem; line-height: 1.2;">ENFORCED</div>
+                    <div class="kpi-label">Security Compliance</div>
+                    <div class="kpi-subtext">Session token verification active</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div style="margin-bottom: 24px;">
+                    {% for category, message in messages %}
+                        <div style="padding: 14px 20px; border-radius: 12px; font-size: 0.92rem; font-weight: 500; display: flex; align-items: center; gap: 12px; {% if category == 'success' %}background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981;{% else %}background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444;{% endif %}">
+                            <span>{% if category == 'success' %}✅{% else %}⚠️{% endif %}</span>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Bento Table Card -->
+        <section class="bento-card">
+            <div class="bento-header">
+                <div>
+                    <div class="bento-title-cluster">
+                        <span class="bento-bullet"></span>
+                        <h2 class="bento-title">Operator Credential Registry</h2>
+                    </div>
+                    <span class="bento-subtitle">Authorized credentials with granular permission tiers</span>
+                </div>
+                <div class="bento-tag">
+                    <span>DATABASE REGISTRY • SECURED</span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Identity & Operator</th>
+                            <th>Contact / Email</th>
+                            <th>Permission Tier</th>
+                            <th>Registration Date</th>
+                            <th>Access Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <span class="id-badge">#{{ "%02d" % user.id }}</span>
+                            </td>
+                            <td>
+                                <div class="user-identity">
+                                    <div class="user-avatar-pip {% if user.role == 'admin' %}admin{% endif %}">
+                                        {{ user.username[:2] }}
+                                    </div>
+                                    <div>
+                                        <div class="user-name-text">{{ user.username }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="user-email-text">
+                                    <span>✉️</span>
+                                    <span>{{ user.email or '—' }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="role-pill {{ user.role }}">
+                                    <span class="role-pip"></span>
+                                    <span>{% if user.role == 'admin' %}👑 ADMIN{% else %}⚡ OPERATOR{% endif %}</span>
+                                </span>
+                            </td>
+                            <td style="color: #94a3b8; font-size: 0.85rem;">
+                                {{ user.created_at }}
+                            </td>
+                            <td>
+                                <span class="status-active-chip">
+                                    <span class="session-dot" style="width: 5px; height: 5px;"></span>
+                                    <span>AUTHORIZED</span>
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Command & Navigation Ribbon -->
+        <footer class="command-bar">
+            <div class="command-bar-info">
+                <div class="command-bar-icon">🛡️</div>
+                <div>
+                    <h4 class="command-bar-title">STMS Intersection Operations</h4>
+                    <p class="command-bar-desc">Navigate directly to the multi-lane surveillance feeds or live telemetry dashboard.</p>
+                </div>
+            </div>
+            <div class="action-group">
+                <a href="{{ url_for('home') }}" class="btn-cyber home">
+                    <span>🏠 Return to Home</span>
+                    <span>&larr;</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn-cyber primary">
+                    <span>🚦 Live Surveillance Feeds</span>
+                    <span>&rarr;</span>
+                </a>
+                <a href="{{ url_for('analysis_page') }}" class="btn-cyber secondary">
+                    <span>📊 Traffic Analytics</span>
+                </a>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- App Footer -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="signal-rail"><span></span><span></span><span></span></span>
+                STMS Security & Identity Engine
+            </div>
+            <div class="footer-text">
+                &copy; 2026 Smart Traffic Management System • Role-Based Access Control Architecture
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/interactive.js') }}"></script>
+</body>
+</html>

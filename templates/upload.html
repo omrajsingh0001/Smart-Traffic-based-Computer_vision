@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configure Surveillance Feeds - STMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================================================
+           ADVANCED CYBERNETIC SURVEILLANCE FEED CONFIGURATION STYLES
+           ========================================================================= */
+        :root {
+            --glow-cyan: rgba(56, 189, 248, 0.5);
+            --glow-emerald: rgba(16, 185, 129, 0.5);
+            --glow-amber: rgba(245, 158, 11, 0.5);
+            --glow-rose: rgba(244, 63, 94, 0.5);
+            --glass-bg: rgba(15, 23, 42, 0.72);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-bright: rgba(56, 189, 248, 0.35);
+        }
+
+        body {
+            background-color: #070b14 !important;
+            color: #f1f5f9;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Ambient Cyber Grid & Glow Orbs */
+        .ambient-mesh-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .ambient-mesh-canvas::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.6;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(130px);
+            opacity: 0.35;
+            animation: orbFloat 18s ease-in-out infinite alternate;
+        }
+
+        .ambient-orb-1 {
+            width: 500px;
+            height: 500px;
+            top: -100px;
+            left: 5%;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.45) 0%, transparent 70%);
+        }
+
+        .ambient-orb-2 {
+            width: 550px;
+            height: 550px;
+            top: 30%;
+            right: -100px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, transparent 70%);
+            animation-duration: 22s;
+        }
+
+        .ambient-orb-3 {
+            width: 450px;
+            height: 450px;
+            bottom: -50px;
+            left: 25%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+            animation-duration: 16s;
+        }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(35px, 25px) scale(1.08); }
+            100% { transform: translate(-25px, 40px) scale(0.95); }
+        }
+
+        /* Top HUD Navigation */
+        .top-nav {
+            background: rgba(10, 15, 29, 0.78) !important;
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.9rem 2.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .brand-cluster {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .signal-rail {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .signal-rail span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .signal-rail span:nth-child(1) {
+            background: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+        }
+
+        .signal-rail span:nth-child(2) {
+            background: #f59e0b;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+        }
+
+        .signal-rail span:nth-child(3) {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+            animation: pulseSignal 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseSignal {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        .brand-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-telemetry-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.05em;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #38bdf8;
+            box-shadow: 0 0 8px #38bdf8;
+            animation: pulseSignal 1.5s infinite;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-btn:hover {
+            color: #ffffff;
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.home-btn {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+        }
+
+        .nav-btn.home-btn:hover {
+            background: rgba(56, 189, 248, 0.22);
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Main Viewport Container */
+        .upload-viewport {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 36px 20px 80px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero Header */
+        .hud-header {
+            text-align: center;
+            margin-bottom: 35px;
+            position: relative;
+        }
+
+        .hud-badge-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #38bdf8;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 5px 14px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .hud-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin: 0 0 12px 0;
+            background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hud-desc {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            max-width: 680px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+
+        .quick-nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quick-nav-pill {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s;
+        }
+
+        .quick-nav-pill.home {
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+        }
+
+        .quick-nav-pill.home:hover {
+            background: rgba(56, 189, 248, 0.25);
+            border-color: #38bdf8;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .quick-nav-pill.dashboard {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #10b981;
+        }
+
+        .quick-nav-pill.dashboard:hover {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+            transform: translateY(-2px);
+        }
+
+        /* Cyber Alert Notifications */
+        .flash-container {
+            margin-bottom: 28px;
+        }
+
+        .cyber-alert {
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(16px);
+        }
+
+        .cyber-alert.success {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+        }
+
+        .cyber-alert.danger {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+        }
+
+        /* Bento Cards */
+        .bento-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 28px 30px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 32px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+            transition: border-color 0.3s;
+        }
+
+        .bento-card.highlight {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .bento-card.highlight::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+        }
+
+        .bento-card.cyan-accent::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+        }
+
+        .card-header-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-title-cluster {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-icon-orb {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            box-shadow: 0 0 18px rgba(16, 185, 129, 0.2);
+        }
+
+        .card-icon-orb.cyan {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.2);
+        }
+
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.28rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .badge-recommended {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-desc {
+            color: #94a3b8;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin: 0 0 24px 0;
+            padding-left: 56px;
+        }
+
+        /* Modern Form Styling */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 640px) {
+            .form-row {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cyber-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 14px 16px;
+            background: rgba(10, 15, 29, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            transition: all 0.25s;
+        }
+
+        .cyber-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+            background: rgba(10, 15, 29, 0.9);
+        }
+
+        .cyber-select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 14px 16px;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .cyber-select:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Buttons */
+        .btn-launch {
+            width: 100%;
+            padding: 15px 24px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+        }
+
+        .btn-launch.emerald {
+            background: linear-gradient(135deg, #059669, #0d9488);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-launch.emerald:hover {
+            background: linear-gradient(135deg, #10b981, #14b8a6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-launch.cyan {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-launch.cyan:hover {
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(56, 189, 248, 0.5);
+        }
+
+        /* Divider */
+        .cyber-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 36px 0;
+            position: relative;
+        }
+
+        .divider-line {
+            flex-grow: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        .divider-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 6px 16px;
+            border-radius: 999px;
+            margin: 0 16px;
+            letter-spacing: 0.05em;
+        }
+
+        /* Sector Grid for MP4 Uploads */
+        .sector-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 640px) {
+            .sector-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .sector-dropzone {
+            background: rgba(10, 15, 29, 0.6);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 16px 18px;
+            transition: all 0.25s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .sector-dropzone:hover {
+            border-color: rgba(56, 189, 248, 0.5);
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .sector-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .sector-tag {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sector-pip {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .sector-pip-1 { background: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+        .sector-pip-2 { background: #10b981; box-shadow: 0 0 8px #10b981; }
+        .sector-pip-3 { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+        .sector-pip-4 { background: #818cf8; box-shadow: 0 0 8px #818cf8; }
+
+        .sector-format {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: #64748b;
+        }
+
+        .file-status-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin: 6px 0 0 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-status-label.has-file {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .hidden-file-input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Bottom Command Actions Banner */
+        .module-nav-banner {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 22px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .banner-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .banner-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #38bdf8;
+        }
+
+        .banner-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 4px 0;
+        }
+
+        .banner-desc {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            margin: 0;
+        }
+
+        .banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-banner {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s;
+        }
+
+        .btn-banner.home {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.2));
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .btn-banner.home:hover {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(14, 165, 233, 0.35));
+            border-color: #38bdf8;
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-banner.dashboard {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        .btn-banner.dashboard:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: #ffffff;
+        }
+
+        /* App Footer */
+        .app-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 24px;
+            text-align: center;
+            background: #040810;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .footer-text {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Ambient Cyber Glow Canvas -->
+    <div class="ambient-mesh-canvas">
+        <div class="ambient-orb ambient-orb-1"></div>
+        <div class="ambient-orb ambient-orb-2"></div>
+        <div class="ambient-orb ambient-orb-3"></div>
+    </div>
+
+    <!-- Top HUD Navigation -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="brand-cluster">
+                <span class="signal-rail">
+                    <span></span><span></span><span></span>
+                </span>
+                <a href="{{ url_for('home') }}" class="brand-title">STMS</a>
+                <span class="nav-telemetry-badge">
+                    <span class="pulse-dot"></span> FEED CONFIG
+                </span>
+            </div>
+
+            <div class="nav-actions">
+                <a href="{{ url_for('home') }}" class="nav-btn home-btn">
+                    <span>🏠 Home Page</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="nav-btn">
+                    <span>🚦 Live Feeds</span>
+                </a>
+                <a href="{{ url_for('analysis_page') }}" class="nav-btn">
+                    <span>📊 Analytics</span>
+                </a>
+                <a href="{{ url_for('challans') }}" class="nav-btn">
+                    <span>🚨 E-Challans</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Viewport -->
+    <main class="upload-viewport">
+
+        <!-- Hero Header -->
+        <header class="hud-header">
+            <div class="hud-badge-tag">
+                <span>📹 SURVEILLANCE FEED INGESTION</span>
+                <span>•</span>
+                <span>YOLOv8 DETECTOR INTERFACE</span>
+            </div>
+            <h1 class="hud-title">Configure Surveillance Feeds</h1>
+            <p class="hud-desc">
+                Stream real-time mobile/IP camera video over Wi-Fi with ultra-low latency, or upload high-resolution multi-sector video recordings for AI traffic analysis.
+            </p>
+            <div class="quick-nav-bar">
+                <a href="{{ url_for('home') }}" class="quick-nav-pill home">
+                    <span>🏠 Back to Home Command Center</span>
+                    <span>&larr;</span>
+                </a>
+                <a href="{{ url_for('load_demo_videos') }}" class="quick-nav-pill" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;">
+                    <span>▶️ Load Demo Simulation Feeds</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="quick-nav-pill dashboard">
+                    <span>🚦 View Live Surveillance Dashboard</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="cyber-alert {% if category == 'success' %}success{% else %}danger{% endif %}">
+                            <span>{% if category == 'success' %}✅{% else %}⚠️{% endif %}</span>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Option 1: Live IP Camera Feed (Zero Delay) -->
+        <section class="bento-card highlight">
+            <div class="card-header-flex">
+                <div class="card-title-cluster">
+                    <div class="card-icon-orb">📡</div>
+                    <div>
+                        <h2 class="card-title">Live Mobile IP Camera (Zero Delay)</h2>
+                    </div>
+                </div>
+                <span class="badge-recommended">
+                    <span class="pulse-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                    RECOMMENDED • 0-DELAY RTSP
+                </span>
+            </div>
+
+            <p class="card-desc">
+                Enter your mobile phone's IP address from any IP Webcam app (e.g. <code>192.168.1.105</code>) to stream live video directly to the YOLOv8 detector in real-time.
+            </p>
+
+            <form action="{{ url_for('set_ip_stream') }}" method="POST">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="camera_ip" class="input-label">
+                            <span>🌐 Camera IP Address or Stream URL</span>
+                        </label>
+                        <input type="text" id="camera_ip" name="camera_ip" placeholder="e.g. 192.168.0.107 or 192.168.1.100:8080" required class="cyber-input">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="stream_lane" class="input-label">
+                            <span>🛣️ Assign to Lane Sector</span>
+                        </label>
+                        <select id="stream_lane" name="stream_lane" class="cyber-select">
+                            <option value="ALL">🌟 ALL Lanes (1 Camera feeds all 4)</option>
+                            <option value="1">Sector 1 (Lane 1)</option>
+                            <option value="2">Sector 2 (Lane 2)</option>
+                            <option value="3">Sector 3 (Lane 3)</option>
+                            <option value="4">Sector 4 (Lane 4)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-launch emerald">
+                    <span>⚡ Connect Live Camera & Launch Dashboard</span>
+                    <span>&rarr;</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Divider -->
+        <div class="cyber-divider">
+            <div class="divider-line"></div>
+            <span class="divider-pill">— OR DEPLOY PRE-RECORDED FOOTAGE —</span>
+            <div class="divider-line"></div>
+        </div>
+
+        <!-- Option 2: Pre-Recorded Footage Upload -->
+        <section class="bento-card cyan-accent">
+            <div class="card-header-flex">
+                <div class="card-title-cluster">
+                    <div class="card-icon-orb cyan">📁</div>
+                    <div>
+                        <h2 class="card-title">Pre-Recorded Traffic Video Upload</h2>
+                    </div>
+                </div>
+                <span class="hud-badge-tag" style="margin: 0;">
+                    <span>MP4 / AVI / MOV SUPPORTED</span>
+                </span>
+            </div>
+
+            <p class="card-desc">
+                Select high-resolution video recordings for each junction approach. The YOLOv8 detector will cycle frames continuously with multi-lane density analytics.
+            </p>
+
+            <form action="{{ url_for('upload_page') }}" method="POST" enctype="multipart/form-data">
+                <div class="sector-grid">
+                    <!-- Sector 1 -->
+                    <div class="sector-dropzone" onclick="document.getElementById('video1').click();">
+                        <input type="file" id="video1" name="video1" accept="video/*" class="hidden-file-input" onchange="updateFileLabel(this, 'label1')">
+                        <div class="sector-header">
+                            <span class="sector-tag">
+                                <span class="sector-pip sector-pip-1"></span>
+                                Sector 1 (Lane 1)
+                            </span>
+                            <span class="sector-format">MP4 / AVI</span>
+                        </div>
+                        <p class="file-status-label" id="label1">📂 Click to choose Sector 1 video...</p>
+                    </div>
+
+                    <!-- Sector 2 -->
+                    <div class="sector-dropzone" onclick="document.getElementById('video2').click();">
+                        <input type="file" id="video2" name="video2" accept="video/*" class="hidden-file-input" onchange="updateFileLabel(this, 'label2')">
+                        <div class="sector-header">
+                            <span class="sector-tag">
+                                <span class="sector-pip sector-pip-2"></span>
+                                Sector 2 (Lane 2)
+                            </span>
+                            <span class="sector-format">MP4 / AVI</span>
+                        </div>
+                        <p class="file-status-label" id="label2">📂 Click to choose Sector 2 video...</p>
+                    </div>
+
+                    <!-- Sector 3 -->
+                    <div class="sector-dropzone" onclick="document.getElementById('video3').click();">
+                        <input type="file" id="video3" name="video3" accept="video/*" class="hidden-file-input" onchange="updateFileLabel(this, 'label3')">
+                        <div class="sector-header">
+                            <span class="sector-tag">
+                                <span class="sector-pip sector-pip-3"></span>
+                                Sector 3 (Lane 3)
+                            </span>
+                            <span class="sector-format">MP4 / AVI</span>
+                        </div>
+                        <p class="file-status-label" id="label3">📂 Click to choose Sector 3 video...</p>
+                    </div>
+
+                    <!-- Sector 4 -->
+                    <div class="sector-dropzone" onclick="document.getElementById('video4').click();">
+                        <input type="file" id="video4" name="video4" accept="video/*" class="hidden-file-input" onchange="updateFileLabel(this, 'label4')">
+                        <div class="sector-header">
+                            <span class="sector-tag">
+                                <span class="sector-pip sector-pip-4"></span>
+                                Sector 4 (Lane 4)
+                            </span>
+                            <span class="sector-format">MP4 / AVI</span>
+                        </div>
+                        <p class="file-status-label" id="label4">📂 Click to choose Sector 4 video...</p>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-launch cyan">
+                    <span>🚀 Ingest Footage & Start AI Detection</span>
+                    <span>&rarr;</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Module Redirect & Command Banner -->
+        <div class="module-nav-banner">
+            <div class="banner-left">
+                <div class="banner-icon">🏠</div>
+                <div>
+                    <h3 class="banner-title">Need to return or explore other modules?</h3>
+                    <p class="banner-desc">Access the Command Center Home or jump directly into the live multi-lane junction feeds.</p>
+                </div>
+            </div>
+            <div class="banner-actions">
+                <a href="{{ url_for('home') }}" class="btn-banner home">
+                    <span>🏠 Redirect to Home Page</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn-banner dashboard">
+                    <span>🚦 Live Surveillance Feeds &rarr;</span>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- App Footer -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="signal-rail"><span></span><span></span><span></span></span>
+                STMS Autonomous Command Center
+            </div>
+            <div class="footer-text">
+                &copy; 2026 Smart Traffic Management System • All Rights Reserved
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function updateFileLabel(input, labelId) {
+            const label = document.getElementById(labelId);
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                label.textContent = `✅ Ready: ${fileName}`;
+                label.classList.add('has-file');
+            } else {
+                label.textContent = '📂 Click to choose video...';
+                label.classList.remove('has-file');
+            }
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/interactive.js') }}"></script>
+</body>
+</html>

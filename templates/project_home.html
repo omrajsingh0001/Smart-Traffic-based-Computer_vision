@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STMS Command Center - Next-Gen Smart City Traffic AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================================================
+           ADVANCED CYBER COMMAND CENTER HERO & BENTO STYLES
+           ========================================================================= */
+        :root {
+            --glow-cyan: rgba(56, 189, 248, 0.45);
+            --glow-emerald: rgba(16, 185, 129, 0.45);
+            --glow-rose: rgba(244, 63, 94, 0.45);
+            --glow-amber: rgba(245, 158, 11, 0.45);
+        }
+
+        body {
+            overflow-x: hidden;
+            background-color: var(--bg) !important;
+            font-family: var(--font-body);
+        }
+
+        /* Ambient Cyber Grid & Glow Backdrop */
+        .ambient-mesh-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.35;
+            animation: orbFloat 14s ease-in-out infinite alternate;
+        }
+
+        .ambient-orb-1 {
+            width: 550px;
+            height: 550px;
+            top: -120px;
+            left: 10%;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.6) 0%, transparent 70%);
+        }
+
+        .ambient-orb-2 {
+            width: 650px;
+            height: 650px;
+            top: 15%;
+            right: -100px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, transparent 70%);
+            animation-duration: 18s;
+        }
+
+        .ambient-orb-3 {
+            width: 450px;
+            height: 450px;
+            bottom: 10%;
+            left: 20%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
+            animation-duration: 16s;
+        }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, 30px) scale(1.08); }
+            100% { transform: translate(-30px, 50px) scale(0.96); }
+        }
+
+        /* Top Nav Enhancements */
+        .top-nav {
+            background: rgba(10, 15, 29, 0.75) !important;
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .live-clock-pill {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #a1a1aa;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 5px 12px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Hero Split Grid */
+        .hero-showcase {
+            position: relative;
+            padding: 70px 24px 100px;
+            max-width: 1420px;
+            margin: 0 auto;
+            z-index: 1;
+        }
+
+        .hero-split {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-split {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+        }
+
+        /* Hero Left Column */
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #6ee7b7;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            width: fit-content;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.4rem, 4.2vw, 3.8rem);
+            font-weight: 800;
+            line-height: 1.12;
+            letter-spacing: -0.02em;
+            margin: 0;
+            background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 60%, #94A3B8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-title .highlight-text {
+            background: linear-gradient(135deg, #38bdf8 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #94a3b8;
+            margin: 0;
+            max-width: 640px;
+        }
+
+        /* Hero Telemetry Pills Ribbon */
+        .telemetry-chip-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .telemetry-chip {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+        .telemetry-chip:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            background: rgba(56, 189, 248, 0.06);
+            transform: translateY(-2px);
+        }
+        .telemetry-chip strong {
+            color: #fff;
+        }
+
+        /* Action Buttons */
+        .hero-cta-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn-launch {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff !important;
+            font-weight: 700;
+            padding: 14px 30px;
+            border-radius: 12px;
+            font-size: 1.02rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-launch:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-challan-cta {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            color: #fca5a5 !important;
+            font-weight: 600;
+            padding: 14px 26px;
+            border-radius: 12px;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+        }
+        .btn-challan-cta:hover {
+            background: rgba(239, 68, 68, 0.22);
+            border-color: #ef4444;
+            color: #fff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.35);
+        }
+
+        .btn-camera-cta {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ededed !important;
+            font-weight: 600;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 0.98rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+        .btn-camera-cta:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* =========================================================================
+           HOLOGRAPHIC 4-WAY INTERSECTION DIGITAL TWIN WIDGET
+           ========================================================================= */
+        .digital-twin-deck {
+            background: rgba(13, 20, 36, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(56, 189, 248, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .digital-twin-deck::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, #38bdf8, #10b981, transparent);
+        }
+
+        .twin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            padding-bottom: 14px;
+        }
+
+        .twin-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .twin-badge-live {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-family: var(--font-mono);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 4-Way Intersection Top-View Canvas */
+        .intersection-arena {
+            width: 100%;
+            height: 330px;
+            background: #090e1a;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.85);
+        }
+
+        /* Intersection Road Cross */
+        .road-vertical {
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 50%;
+            width: 120px;
+            transform: translateX(-50%);
+            background: #141b2d;
+            border-left: 2px dashed rgba(255, 255, 255, 0.12);
+            border-right: 2px dashed rgba(255, 255, 255, 0.12);
+        }
+
+        .road-horizontal {
+            position: absolute;
+            left: 0; right: 0;
+            top: 50%;
+            height: 120px;
+            transform: translateY(-50%);
+            background: #141b2d;
+            border-top: 2px dashed rgba(255, 255, 255, 0.12);
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.12);
+        }
+
+        .road-center-box {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 120px; height: 120px;
+            transform: translate(-50%, -50%);
+            background: #111726;
+            border: 1px dashed rgba(56, 189, 248, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .radar-sweep-center {
+            position: absolute;
+            width: 180px; height: 180px;
+            border-radius: 50%;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            animation: radarPulse 3s infinite ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes radarPulse {
+            0% { transform: scale(0.6); opacity: 0.8; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        /* Zebra Crossings */
+        .zebra-stripe {
+            position: absolute;
+            background: repeating-linear-gradient(90deg, rgba(255,255,255,0.2) 0, rgba(255,255,255,0.2) 6px, transparent 6px, transparent 12px);
+            z-index: 2;
+        }
+        .zebra-north { top: 78px; left: calc(50% - 60px); width: 120px; height: 18px; }
+        .zebra-south { bottom: 78px; left: calc(50% - 60px); width: 120px; height: 18px; }
+        .zebra-west  { left: 78px; top: calc(50% - 60px); height: 120px; width: 18px; background: repeating-linear-gradient(0deg, rgba(255,255,255,0.2) 0, rgba(255,255,255,0.2) 6px, transparent 6px, transparent 12px); }
+        .zebra-east  { right: 78px; top: calc(50% - 60px); height: 120px; width: 18px; background: repeating-linear-gradient(0deg, rgba(255,255,255,0.2) 0, rgba(255,255,255,0.2) 6px, transparent 6px, transparent 12px); }
+
+        /* Lane Traffic Light Nodes */
+        .lane-node {
+            position: absolute;
+            background: rgba(9, 13, 24, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 5;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .lane-node.active-green {
+            border-color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
+        }
+
+        .lane-node.active-red {
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .node-light-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .node-light-dot.green { background: #10b981; box-shadow: 0 0 10px #10b981; }
+        .node-light-dot.red { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+
+        .node-lane-1 { top: 12px; left: 50%; transform: translateX(-50%); }
+        .node-lane-3 { bottom: 12px; left: 50%; transform: translateX(-50%); }
+        .node-lane-4 { left: 12px; top: 50%; transform: translateY(-50%); }
+        .node-lane-2 { right: 12px; top: 50%; transform: translateY(-50%); }
+
+        /* Vehicle Animated Particle */
+        .vehicle-particle {
+            position: absolute;
+            width: 14px;
+            height: 24px;
+            border-radius: 4px;
+            background: #38bdf8;
+            box-shadow: 0 0 10px #38bdf8;
+            z-index: 4;
+            transition: all 0.5s ease;
+        }
+
+        .ambulance-particle {
+            background: #ef4444 !important;
+            box-shadow: 0 0 15px #ef4444, 0 0 25px #38bdf8 !important;
+            animation: ambulanceFlash 0.3s infinite alternate;
+        }
+
+        @keyframes ambulanceFlash {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(90deg); }
+        }
+
+        /* Twin Control Strip */
+        .twin-action-strip {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .twin-btn {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            color: #ededed;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .twin-btn:hover {
+            background: rgba(255, 255, 255, 0.09);
+            transform: translateY(-1px);
+        }
+        .twin-btn.danger-demo {
+            border-color: rgba(244, 63, 94, 0.4);
+            color: #fca5a5;
+        }
+        .twin-btn.danger-demo:hover {
+            background: rgba(244, 63, 94, 0.15);
+            border-color: #f43f5e;
+        }
+
+        /* =========================================================================
+           HIGH-IMPACT KPI METRICS DECK
+           ========================================================================= */
+        .kpi-metrics-deck {
+            max-width: 1420px;
+            margin: 0 auto 70px;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .kpi-metrics-deck { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .kpi-metrics-deck { grid-template-columns: 1fr; }
+        }
+
+        .kpi-card {
+            background: rgba(13, 19, 35, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.15);
+        }
+        .kpi-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 40px; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+            transform: skewX(-20deg);
+        }
+
+        .kpi-card-icon {
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+        }
+
+        .kpi-val {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .kpi-val span.unit {
+            font-size: 1rem;
+            color: #38bdf8;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+        .kpi-card.emerald .kpi-val span.unit { color: #10b981; }
+        .kpi-card.rose .kpi-val span.unit { color: #f43f5e; }
+        .kpi-card.amber .kpi-val span.unit { color: #f59e0b; }
+
+        .kpi-label {
+            font-family: var(--font-display);
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 4px;
+        }
+
+        .kpi-sub {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+
+        /* =========================================================================
+           ADVANCED BENTO GRID FOR CORE CAPABILITIES
+           ========================================================================= */
+        .section-wrap {
+            max-width: 1420px;
+            margin: 0 auto 90px;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-header-centered {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .section-header-centered h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.01em;
+            margin: 0 0 12px;
+        }
+        .section-header-centered p {
+            font-size: 1.05rem;
+            color: #94a3b8;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 22px;
+        }
+
+        .bento-card {
+            background: rgba(13, 19, 35, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .bento-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.12);
+        }
+
+        .bento-col-8 { grid-column: span 8; }
+        .bento-col-4 { grid-column: span 4; }
+        .bento-col-6 { grid-column: span 6; }
+        .bento-col-12 { grid-column: span 12; }
+
+        @media (max-width: 1024px) {
+            .bento-col-8, .bento-col-4, .bento-col-6 { grid-column: span 12; }
+        }
+
+        .bento-badge {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 4px 10px;
+            border-radius: 6px;
+            width: fit-content;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .bento-badge.cyan { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); }
+        .bento-badge.emerald { background: rgba(16, 185, 129, 0.1); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+        .bento-badge.rose { background: rgba(244, 63, 94, 0.1); color: #fda4af; border-color: rgba(244, 63, 94, 0.3); }
+        .bento-badge.amber { background: rgba(245, 158, 11, 0.1); color: #fde68a; border-color: rgba(245, 158, 11, 0.3); }
+
+        .bento-title {
+            font-family: var(--font-display);
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0 0 10px;
+        }
+
+        .bento-desc {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #94a3b8;
+            margin: 0 0 20px;
+        }
+
+        /* Bento Interactive Visual Mini-Elements */
+        .timing-bar-compare {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .timing-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+        .timing-lbl { width: 130px; color: #a1a1aa; }
+        .timing-track {
+            flex-grow: 1;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+        .timing-fill-legacy { width: 90%; background: #ef4444; height: 100%; border-radius: 999px; }
+        .timing-fill-ai { width: 35%; background: #10b981; height: 100%; border-radius: 999px; box-shadow: 0 0 10px #10b981; }
+
+        /* Mock License Plate Mini Card */
+        .mock-plate-box {
+            background: #000;
+            border: 2px solid #eab308;
+            border-radius: 8px;
+            padding: 8px 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-mono);
+            font-size: 1.3rem;
+            color: #facc15;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.25);
+            width: fit-content;
+        }
+
+        /* =========================================================================
+           INTERACTIVE REAL-WORLD SCENARIOS TABS
+           ========================================================================= */
+        .scenario-tabs-container {
+            background: rgba(13, 19, 35, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 36px;
+            backdrop-filter: blur(20px);
+        }
+
+        .scenario-nav-pills {
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 18px;
+            margin-bottom: 28px;
+            overflow-x: auto;
+        }
+
+        .scenario-tab-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-family: var(--font-display);
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .scenario-tab-btn:hover {
+            color: #fff;
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+        .scenario-tab-btn.active {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: #38bdf8;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+        }
+
+        .scenario-tab-pane {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            animation: fadeIn 0.3s ease;
+        }
+        .scenario-tab-pane.active {
+            display: grid;
+        }
+
+        @media (max-width: 900px) {
+            .scenario-tab-pane { grid-template-columns: 1fr; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .scenario-box-problem {
+            background: rgba(239, 68, 68, 0.06);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .scenario-box-solution {
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .scenario-pane-title {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .scenario-pane-title.red { color: #f87171; }
+        .scenario-pane-title.green { color: #34d399; }
+        .scenario-pane-text {
+            color: #cbd5e1;
+            font-size: 0.98rem;
+            line-height: 1.65;
+        }
+
+        /* Quick Launch Grid at Bottom */
+        .quick-launch-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+        @media (max-width: 900px) {
+            .quick-launch-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 500px) {
+            .quick-launch-grid { grid-template-columns: 1fr; }
+        }
+
+        .launch-tile {
+            background: rgba(13, 19, 35, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 22px;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.25s ease;
+        }
+        .launch-tile:hover {
+            border-color: rgba(56, 189, 248, 0.45);
+            transform: translateY(-4px);
+            background: rgba(20, 30, 54, 0.9);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        .launch-tile-icon { font-size: 1.8rem; }
+        .launch-tile-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; }
+        .launch-tile-desc { font-size: 0.82rem; color: #94a3b8; line-height: 1.45; }
+        .launch-tile-arrow { font-size: 0.85rem; color: #38bdf8; font-family: var(--font-mono); margin-top: auto; }
+    </style>
+</head>
+
+<body>
+    <!-- Ambient Cyber Glows -->
+    <div class="ambient-mesh-canvas">
+        <div class="ambient-orb ambient-orb-1"></div>
+        <div class="ambient-orb ambient-orb-2"></div>
+        <div class="ambient-orb ambient-orb-3"></div>
+    </div>
+
+    <!-- Top Cyber HUD Navbar -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="signal-rail"><span></span><span></span><span></span></span>
+                <span class="brand-title">STMS</span>
+                <span class="live-telemetry-badge" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">
+                    <span class="live-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></span> SMART CITY AI ACTIVE
+                </span>
+            </div>
+
+            <!-- Real-time HUD Clock -->
+            <div class="live-clock-pill">
+                <span>🕒</span>
+                <span id="hud-clock">--:--:--</span>
+                <span style="color: #64748b;">|</span>
+                <span style="color: #38bdf8;">ACTIVE</span>
+            </div>
+
+            <div class="nav-hud-group">
+                <a href="{{ url_for('dashboard') }}" class="nav-pill-btn">
+                    <span class="nav-icon-orb emerald">🚦</span>
+                    <span>Live Feeds</span>
+                </a>
+                <a href="{{ url_for('analysis_page') }}" class="nav-pill-btn">
+                    <span class="nav-icon-orb cyan">📊</span>
+                    <span>Analytics</span>
+                </a>
+                <a href="{{ url_for('challans') }}" class="nav-pill-btn">
+                    <span class="nav-icon-orb amber">📋</span>
+                    <span>E-Challans</span>
+                </a>
+                {% if session.role == 'admin' %}
+                <a href="{{ url_for('manage_operators') }}" class="nav-pill-btn">
+                    <span class="nav-icon-orb purple">👥</span>
+                    <span>Operators</span>
+                </a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="nav-pill-btn" style="border-color: rgba(239, 68, 68, 0.3);">
+                    <span class="nav-icon-orb red">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Showcase Section with Interactive Intersection Digital Twin -->
+    <section class="hero-showcase">
+        <div class="hero-split">
+            <!-- Left: High-Impact Typography & CTA -->
+            <div class="hero-left">
+                <div class="hero-eyebrow">
+                    <span class="signal-rail"><span></span><span></span><span></span></span>
+                    <span>STMS COMMAND CENTER &bull; NEXT-GEN SMART MOBILITY</span>
+                </div>
+
+                <h1 class="hero-title">
+                    Autonomous <span class="highlight-text">Traffic AI</span> &amp; Precision Enforcement
+                </h1>
+
+                <p class="hero-desc">
+                    Real-time 4-way intersection governance orchestrated by dual YOLOv8 neural vision, sub-second ambulance preemption, automated ANPR red-light ticketing, and hardware-synchronized ESP32 relays.
+                </p>
+
+                <!-- Live Technical Specs Ticker -->
+                <div class="telemetry-chip-bar">
+                    <div class="telemetry-chip">
+                        <span style="color: #10b981;">●</span>
+                        <span>Vision: <strong>YOLOv8 (~30 FPS)</strong></span>
+                    </div>
+                    <div class="telemetry-chip">
+                        <span style="color: #38bdf8;">●</span>
+                        <span>Hardware: <strong>ESP32 Serial 115200</strong></span>
+                    </div>
+                    <div class="telemetry-chip">
+                        <span style="color: #f43f5e;">●</span>
+                        <span>Enforcement: <strong>Auto ANPR (₹1000)</strong></span>
+                    </div>
+                    <div class="telemetry-chip">
+                        <span style="color: #f59e0b;">●</span>
+                        <span>Corridor: <strong>Ambulance Priority</strong></span>
+                    </div>
+                </div>
+
+                <!-- Action Button Group -->
+                <div class="hero-cta-group">
+                    <a href="{{ url_for('dashboard') }}" class="btn-launch">
+                        <span>🟢 Launch Live Dashboard</span>
+                        <span>&rarr;</span>
+                    </a>
+                    <a href="{{ url_for('challans') }}" class="btn-challan-cta">
+                        <span>🚨 E-Challan Enforcement</span>
+                    </a>
+                    <a href="{{ url_for('upload_page') }}" class="btn-camera-cta">
+                        <span>📡 Cameras / Video Feeds</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Interactive Holographic Intersection Digital Twin -->
+            <div class="digital-twin-deck">
+                <div class="twin-header">
+                    <div class="twin-title">
+                        <span>🌐</span>
+                        <span>Intersection Digital Twin</span>
+                    </div>
+                    <div class="twin-badge-live">
+                        <span class="live-dot" style="background: #10b981;"></span>
+                        <span>LIVE DUAL-YOLO STREAM</span>
+                    </div>
+                </div>
+
+                <!-- 4-Way Cross Road Visualization -->
+                <div class="intersection-arena">
+                    <div class="radar-sweep-center" style="top: calc(50% - 90px); left: calc(50% - 90px);"></div>
+                    <div class="road-vertical"></div>
+                    <div class="road-horizontal"></div>
+
+                    <!-- Zebra Crossings -->
+                    <div class="zebra-stripe zebra-north"></div>
+                    <div class="zebra-stripe zebra-south"></div>
+                    <div class="zebra-stripe zebra-west"></div>
+                    <div class="zebra-stripe zebra-east"></div>
+
+                    <!-- Center Junction Core -->
+                    <div class="road-center-box">
+                        <span style="font-size: 1.4rem;">🚦</span>
+                    </div>
+
+                    <!-- Animated Vehicle Particle on Active Lane -->
+                    <div id="sim-vehicle" class="vehicle-particle" style="top: 25px; left: calc(50% + 15px);"></div>
+
+                    <!-- Lane Signal Nodes -->
+                    <div id="node-1" class="lane-node node-lane-1 active-green">
+                        <span class="node-light-dot green" id="dot-1"></span>
+                        <span>Lane 1: <strong id="lbl-1" style="color: #34d399;">GREEN (18s)</strong></span>
+                    </div>
+
+                    <div id="node-4" class="lane-node node-lane-4 active-red">
+                        <span class="node-light-dot red" id="dot-4"></span>
+                        <span>Lane 4: <strong id="lbl-4" style="color: #f87171;">RED</strong></span>
+                    </div>
+
+                    <div id="node-2" class="lane-node node-lane-2 active-red">
+                        <span class="node-light-dot red" id="dot-2"></span>
+                        <span>Lane 2: <strong id="lbl-2" style="color: #f87171;">RED</strong></span>
+                    </div>
+
+                    <div id="node-3" class="lane-node node-lane-3 active-red">
+                        <span class="node-light-dot red" id="dot-3"></span>
+                        <span>Lane 3: <strong id="lbl-3" style="color: #f87171;">RED</strong></span>
+                    </div>
+                </div>
+
+                <!-- Digital Twin Interactive Control Strip -->
+                <div class="twin-action-strip">
+                    <button type="button" class="twin-btn danger-demo" onclick="triggerSimulatedAmbulance()">
+                        <span>🚑 Simulate Ambulance</span>
+                    </button>
+                    <button type="button" class="twin-btn" onclick="cycleNextSignal()">
+                        <span>🔄 Switch Signal Phase</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- High-Impact KPI Performance Counters -->
+    <section class="kpi-metrics-deck">
+        <div class="kpi-card emerald">
+            <div class="kpi-card-icon">🚦</div>
+            <div class="kpi-val">4 <span class="unit">Lanes</span></div>
+            <div class="kpi-label">Concurrent AI Surveillance</div>
+            <div class="kpi-sub">Continuous quad-feed vehicle detection</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-card-icon">⚡</div>
+            <div class="kpi-val">&lt; 45 <span class="unit">ms</span></div>
+            <div class="kpi-label">Neural Inference Latency</div>
+            <div class="kpi-sub">Optimized YOLOv8 real-time core</div>
+        </div>
+        <div class="kpi-card amber">
+            <div class="kpi-card-icon">📉</div>
+            <div class="kpi-val">38.4% <span class="unit">Drop</span></div>
+            <div class="kpi-label">Junction Congestion Relief</div>
+            <div class="kpi-sub">Compared to legacy 60s fixed timers</div>
+        </div>
+        <div class="kpi-card rose">
+            <div class="kpi-card-icon">🚑</div>
+            <div class="kpi-val">0.0 <span class="unit">Sec</span></div>
+            <div class="kpi-label">Ambulance Corridor Wait</div>
+            <div class="kpi-sub">Immediate preemption override</div>
+        </div>
+    </section>
+
+    <!-- Next-Gen Bento Grid Section -->
+    <section class="section-wrap">
+        <div class="section-header-centered">
+            <h2>Core Intelligent Capabilities</h2>
+            <p>Engineered for high-volume urban arterial junctions requiring zero-delay decision making and automated enforcement.</p>
+        </div>
+
+        <div class="bento-grid">
+            <!-- Bento 1: Adaptive Dynamic Timing -->
+            <div class="bento-card bento-col-8">
+                <div>
+                    <div class="bento-badge emerald">ADAPTIVE TIMING ENGINE</div>
+                    <h3 class="bento-title">Density-Proportional Signal Actuation</h3>
+                    <p class="bento-desc">
+                        Rather than wasting green lights on vacant lanes, STMS measures vehicle queue length in real-time and dynamically scales green durations (10s to 45s) to dissolve traffic bottlenecks as they form.
+                    </p>
+                    
+                    <div class="timing-bar-compare">
+                        <div class="timing-row">
+                            <span class="timing-lbl">Legacy Fixed Timer</span>
+                            <div class="timing-track"><div class="timing-fill-legacy"></div></div>
+                            <span style="color: #f87171; font-weight: bold;">60s Fixed Wait</span>
+                        </div>
+                        <div class="timing-row">
+                            <span class="timing-lbl">STMS AI Adaptive</span>
+                            <div class="timing-track"><div class="timing-fill-ai"></div></div>
+                            <span style="color: #34d399; font-weight: bold;">18s Dynamic Clear</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bento 2: Ambulance Preemption -->
+            <div class="bento-card bento-col-4">
+                <div>
+                    <div class="bento-badge rose">CRITICAL RESCUE</div>
+                    <h3 class="bento-title">Ambulance Preemption</h3>
+                    <p class="bento-desc">
+                        Dedicated deep classification model detects emergency medical sirens and vehicles up to 80 meters away, locking cross-traffic to RED and holding a clear green-wave corridor.
+                    </p>
+                </div>
+                <div style="background: rgba(244,63,94,0.1); border: 1px dashed rgba(244,63,94,0.3); border-radius: 12px; padding: 14px; text-align: center;">
+                    <span style="font-size: 1.8rem;">🚑</span>
+                    <div style="font-size: 0.82rem; font-family: var(--font-mono); color: #fda4af; margin-top: 4px;">&lt; 0.5s Override Execution</div>
+                </div>
+            </div>
+
+            <!-- Bento 3: Automatic E-Challan & ANPR -->
+            <div class="bento-card bento-col-4">
+                <div>
+                    <div class="bento-badge amber">AUTOMATED ENFORCEMENT</div>
+                    <h3 class="bento-title">Instant E-Challan &amp; ANPR</h3>
+                    <p class="bento-desc">
+                        Vehicles jumping red lights are tracked past the virtual intersection line. ANPR extracts the license plate number, issues a ₹1000 legal citation, and archives evidence snapshots.
+                    </p>
+                </div>
+                <div class="mock-plate-box">
+                    <span>IND</span>
+                    <span>MH12-RN-2623</span>
+                </div>
+            </div>
+
+            <!-- Bento 4: ESP32 IoT Microcontroller -->
+            <div class="bento-card bento-col-4">
+                <div>
+                    <div class="bento-badge cyan">IOT HARDWARE</div>
+                    <h3 class="bento-title">ESP32 Hardware Sync</h3>
+                    <p class="bento-desc">
+                        Bi-directional high-speed UART serial bus (115200 baud) keeps the cloud AI in perfect lockstep with physical intersection LED matrices and industrial relay banks.
+                    </p>
+                </div>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #a1a1aa; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px;">
+                    <div>&bull; Port: COM9 / USB-UART</div>
+                    <div>&bull; State Protocol: [G-R-R-R]</div>
+                </div>
+            </div>
+
+            <!-- Bento 5: High-Res Telemetry Analytics -->
+            <div class="bento-card bento-col-4">
+                <div>
+                    <div class="bento-badge cyan">BIG DATA ANALYTICS</div>
+                    <h3 class="bento-title">Traffic Telemetry Reports</h3>
+                    <p class="bento-desc">
+                        Export official government-standard PDF and CSV audit logs of intersection throughput, vehicle type distributions, peak rush trends, and congestion heatmaps.
+                    </p>
+                </div>
+                <a href="{{ url_for('analysis_page') }}" style="color: #38bdf8; font-family: var(--font-mono); font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <span>Open Analytics Studio</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Real-World Scenarios Tabbed Studio -->
+    <section class="section-wrap">
+        <div class="section-header-centered">
+            <h2>Real-World Deployment Scenarios</h2>
+            <p>Explore how STMS handles the most challenging urban traffic conditions faced by metropolitan police departments.</p>
+        </div>
+
+        <div class="scenario-tabs-container">
+            <div class="scenario-nav-pills">
+                <button type="button" class="scenario-tab-btn active" onclick="switchScenarioTab('tab-rush')">
+                    <span>🚗</span> <span>Scenario 1: Rush Hour</span>
+                </button>
+                <button type="button" class="scenario-tab-btn" onclick="switchScenarioTab('tab-ambulance')">
+                    <span>🚑</span> <span>Scenario 2: Emergency Corridor</span>
+                </button>
+                <button type="button" class="scenario-tab-btn" onclick="switchScenarioTab('tab-violation')">
+                    <span>📸</span> <span>Scenario 3: Red-Light Violation</span>
+                </button>
+                <button type="button" class="scenario-tab-btn" onclick="switchScenarioTab('tab-police')">
+                    <span>👮‍♂️</span> <span>Scenario 4: Officer Override</span>
+                </button>
+            </div>
+
+            <!-- Tab 1 -->
+            <div id="tab-rush" class="scenario-tab-pane active">
+                <div class="scenario-box-problem">
+                    <div class="scenario-pane-title red">⚠️ The Real-World Bottleneck</div>
+                    <div class="scenario-pane-text">
+                        During morning 9:00 AM rush hours, arterial lanes carrying 40+ office commuters get identical 60-second green windows as cross-streets with only 2 cars. This causes bumper-to-bumper kilometer-long gridlock and millions in wasted fuel.
+                    </div>
+                </div>
+                <div class="scenario-box-solution">
+                    <div class="scenario-pane-title green">⚡ STMS Intelligent Resolution</div>
+                    <div class="scenario-pane-text">
+                        YOLOv8 detects 42 vehicles on Lane 1 and automatically extends green time to the maximum 45-second duration, draining the queue completely before rotating to lower-density lanes. Wait time drops by 38.4%.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2 -->
+            <div id="tab-ambulance" class="scenario-tab-pane">
+                <div class="scenario-box-problem">
+                    <div class="scenario-pane-title red">⚠️ Critical Golden-Hour Emergency</div>
+                    <div class="scenario-pane-text">
+                        Trauma ambulances carrying critical patients get trapped behind red-light intersection deadlocks, losing vital life-saving minutes because conventional signals cannot see emergency vehicles.
+                    </div>
+                </div>
+                <div class="scenario-box-solution">
+                    <div class="scenario-pane-title green">⚡ STMS Intelligent Resolution</div>
+                    <div class="scenario-pane-text">
+                        Computer vision identifies approaching ambulance beacons in Lane 3, immediately halts current traffic, and turns the approach lane GREEN with zero human intervention, achieving 100% free-flow transit.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3 -->
+            <div id="tab-violation" class="scenario-tab-pane">
+                <div class="scenario-box-problem">
+                    <div class="scenario-pane-title red">⚠️ Hazardous Intersection Jumping</div>
+                    <div class="scenario-pane-text">
+                        Drivers jumping red lights at high speeds cause over 40% of fatal junction collisions in major cities. Manual police standing at intersections cannot safely intercept violators.
+                    </div>
+                </div>
+                <div class="scenario-box-solution">
+                    <div class="scenario-pane-title green">⚡ STMS Intelligent Resolution</div>
+                    <div class="scenario-pane-text">
+                        High-speed ANPR camera captures clear evidence snapshot of the license plate, computes the ₹1000 penalty, logs it into MySQL database, and generates an official printable police citation slip instantly.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4 -->
+            <div id="tab-police" class="scenario-tab-pane">
+                <div class="scenario-box-problem">
+                    <div class="scenario-pane-title red">⚠️ VIP Convoys &amp; Accident Clearance</div>
+                    <div class="scenario-pane-text">
+                        During VIP motorcades or junction accidents, traffic officers must open electrical junction boxes and tamper with manual switches in bad weather.
+                    </div>
+                </div>
+                <div class="scenario-box-solution">
+                    <div class="scenario-pane-title green">⚡ STMS Intelligent Resolution</div>
+                    <div class="scenario-pane-text">
+                        Traffic police command officers simply click "🟢 Force Lane Green" from the web command deck on any tablet or smartphone, locking the desired lane green instantaneously (&lt;100ms hardware latency).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Unified Quick Launch Grid -->
+    <section class="section-wrap">
+        <div class="section-header-centered">
+            <h2>Command Modules</h2>
+            <p>Direct access to all active surveillance and administrative subsystems.</p>
+        </div>
+
+        <div class="quick-launch-grid">
+            <a href="{{ url_for('dashboard') }}" class="launch-tile">
+                <div class="launch-tile-icon">🚦</div>
+                <div class="launch-tile-title">Live Intersection HUD</div>
+                <div class="launch-tile-desc">Quad-stream real-time surveillance, bounding boxes, manual signal override deck.</div>
+                <div class="launch-tile-arrow">Launch Feed &rarr;</div>
+            </a>
+
+            <a href="{{ url_for('challans') }}" class="launch-tile">
+                <div class="launch-tile-icon">🚨</div>
+                <div class="launch-tile-title">E-Challans Desk</div>
+                <div class="launch-tile-desc">Automated ANPR violation records, photographic evidence, and printable notices.</div>
+                <div class="launch-tile-arrow">Open Records &rarr;</div>
+            </a>
+
+            <a href="{{ url_for('analysis_page') }}" class="launch-tile">
+                <div class="launch-tile-icon">📊</div>
+                <div class="launch-tile-title">Traffic Analytics</div>
+                <div class="launch-tile-desc">Telemetry graphs, vehicle classifications, and PDF/CSV compliance report generator.</div>
+                <div class="launch-tile-arrow">View Insights &rarr;</div>
+            </a>
+
+            <a href="{{ url_for('upload_page') }}" class="launch-tile">
+                <div class="launch-tile-icon">📡</div>
+                <div class="launch-tile-title">Camera Configuration</div>
+                <div class="launch-tile-desc">Connect zero-delay smartphone cameras over WiFi or upload intersection video files.</div>
+                <div class="launch-tile-arrow">Configure Feeds &rarr;</div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Unified Footer -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="signal-rail"><span></span><span></span><span></span></span>
+                STMS Command Center
+            </div>
+            <div class="footer-text">
+                &copy; 2026 Smart Traffic Management System. Autonomous Vision &amp; IoT Traffic Control.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script src="{{ url_for('static', filename='js/interactive.js') }}"></script>
+    <script>
+        // Live Real-Time Clock
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            const clockEl = document.getElementById('hud-clock');
+            if (clockEl) clockEl.innerText = timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Scenario Tabs Switcher
+        function switchScenarioTab(tabId) {
+            document.querySelectorAll('.scenario-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.scenario-tab-pane').forEach(pane => pane.classList.remove('active'));
+
+            event.currentTarget.classList.add('active');
+            const target = document.getElementById(tabId);
+            if (target) target.classList.add('active');
+        }
+
+        // Digital Twin Interactive Simulation
+        let currentActiveLane = 1;
+        const lanes = [1, 2, 3, 4];
+
+        function setTwinSignal(laneId, duration = 18, isAmbulance = false) {
+            currentActiveLane = laneId;
+            lanes.forEach(l => {
+                const node = document.getElementById(`node-${l}`);
+                const dot = document.getElementById(`dot-${l}`);
+                const lbl = document.getElementById(`lbl-${l}`);
+                if (!node || !dot || !lbl) return;
+
+                if (l === laneId) {
+                    node.className = 'lane-node node-lane-' + l + ' active-green';
+                    dot.className = 'node-light-dot green';
+                    lbl.style.color = '#34d399';
+                    lbl.innerText = isAmbulance ? 'AMBULANCE (Corridor)' : `GREEN (${duration}s)`;
+                } else {
+                    node.className = 'lane-node node-lane-' + l + ' active-red';
+                    dot.className = 'node-light-dot red';
+                    lbl.style.color = '#f87171';
+                    lbl.innerText = 'RED';
+                }
+            });
+
+            // Animate vehicle particle
+            const p = document.getElementById('sim-vehicle');
+            if (p) {
+                p.className = isAmbulance ? 'vehicle-particle ambulance-particle' : 'vehicle-particle';
+                if (laneId === 1) {
+                    p.style.top = '25px';
+                    p.style.left = 'calc(50% + 15px)';
+                    setTimeout(() => p.style.top = '280px', 100);
+                } else if (laneId === 2) {
+                    p.style.top = 'calc(50% + 15px)';
+                    p.style.left = '280px';
+                    setTimeout(() => p.style.left = '25px', 100);
+                } else if (laneId === 3) {
+                    p.style.top = '280px';
+                    p.style.left = 'calc(50% - 25px)';
+                    setTimeout(() => p.style.top = '25px', 100);
+                } else if (laneId === 4) {
+                    p.style.top = 'calc(50% - 25px)';
+                    p.style.left = '25px';
+                    setTimeout(() => p.style.left = '280px', 100);
+                }
+            }
+        }
+
+        function cycleNextSignal() {
+            let nextIndex = (lanes.indexOf(currentActiveLane) + 1) % lanes.length;
+            setTwinSignal(lanes[nextIndex], 15);
+        }
+
+        function triggerSimulatedAmbulance() {
+            setTwinSignal(3, 25, true);
+        }
+
+        // Auto-cycle twin every 5 seconds for live presentation
+        setInterval(() => {
+            cycleNextSignal();
+        }, 5000);
+    </script>
+</body>
+</html>

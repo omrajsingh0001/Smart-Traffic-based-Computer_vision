@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STMS Analytics HUD - Real-Time Traffic Intelligence</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* =========================================================================
+           ADVANCED CYBERNETIC ANALYTICS HUD STYLES
+           ========================================================================= */
+        :root {
+            --glow-cyan: rgba(56, 189, 248, 0.5);
+            --glow-emerald: rgba(16, 185, 129, 0.5);
+            --glow-amber: rgba(245, 158, 11, 0.5);
+            --glow-rose: rgba(244, 63, 94, 0.5);
+            --glass-bg: rgba(15, 23, 42, 0.72);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-bright: rgba(56, 189, 248, 0.35);
+        }
+
+        body {
+            background-color: #070b14 !important;
+            color: #f1f5f9;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Ambient Cyber Grid & Glow Orbs */
+        .ambient-mesh-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .ambient-mesh-canvas::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.6;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(130px);
+            opacity: 0.35;
+            animation: orbFloat 18s ease-in-out infinite alternate;
+        }
+
+        .ambient-orb-1 {
+            width: 500px;
+            height: 500px;
+            top: -100px;
+            left: 5%;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.45) 0%, transparent 70%);
+        }
+
+        .ambient-orb-2 {
+            width: 550px;
+            height: 550px;
+            top: 25%;
+            right: -100px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, transparent 70%);
+            animation-duration: 22s;
+        }
+
+        .ambient-orb-3 {
+            width: 450px;
+            height: 450px;
+            bottom: -50px;
+            left: 25%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+            animation-duration: 16s;
+        }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(35px, 25px) scale(1.08); }
+            100% { transform: translate(-25px, 40px) scale(0.95); }
+        }
+
+        /* Top HUD Navigation */
+        .analysis-nav {
+            background: rgba(10, 15, 29, 0.78);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.9rem 2.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .analysis-nav .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .brand-cluster {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .signal-rail {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .signal-rail span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .signal-rail span:nth-child(1) {
+            background: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+        }
+
+        .signal-rail span:nth-child(2) {
+            background: #f59e0b;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+        }
+
+        .signal-rail span:nth-child(3) {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+            animation: pulseSignal 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseSignal {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        .brand-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-telemetry-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.05em;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #38bdf8;
+            box-shadow: 0 0 8px #38bdf8;
+            animation: pulseSignal 1.5s infinite;
+        }
+
+        .nav-hud-center {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .live-clock-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 5px 12px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 7px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .nav-btn:hover {
+            color: #ffffff;
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(16, 185, 129, 0.2));
+            border-color: rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
+        }
+
+        .nav-btn.primary:hover {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.35), rgba(16, 185, 129, 0.35));
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+        }
+
+        /* Main Container */
+        .analytics-viewport {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px 60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero Header Section */
+        .hud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .hud-header-left {
+            max-width: 780px;
+        }
+
+        .hud-badge-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #38bdf8;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 5px 12px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .hud-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin: 0 0 8px 0;
+            line-height: 1.15;
+            background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hud-desc {
+            font-size: 0.92rem;
+            color: #94a3b8;
+            margin: 0;
+            line-height: 1.5;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hud-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hud-cadence-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 6px 14px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cadence-ping {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulseSignal 1.8s infinite;
+        }
+
+        /* KPI Bento Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .kpi-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 20px 22px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--card-accent, #38bdf8), transparent);
+            opacity: 0.6;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px var(--card-glow, rgba(56, 189, 248, 0.2));
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .kpi-icon-orb {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .kpi-icon-orb.cyan {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+        }
+
+        .kpi-icon-orb.emerald {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        }
+
+        .kpi-icon-orb.rose {
+            background: rgba(244, 63, 94, 0.12);
+            border-color: rgba(244, 63, 94, 0.3);
+            color: #f43f5e;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.15);
+        }
+
+        .kpi-icon-orb.amber {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+        }
+
+        .kpi-trend-chip {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+        }
+
+        .kpi-trend-chip.positive {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        .kpi-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1;
+            margin-bottom: 6px;
+            letter-spacing: -0.03em;
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .kpi-subtext {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: #64748b;
+        }
+
+        /* Glass Bento Container */
+        .bento-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px 26px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 28px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+        }
+
+        .bento-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .bento-title-cluster {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bento-bullet {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            background: #38bdf8;
+            box-shadow: 0 0 10px #38bdf8;
+        }
+
+        .bento-bullet.emerald { background: #10b981; box-shadow: 0 0 10px #10b981; }
+        .bento-bullet.amber { background: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
+        .bento-bullet.rose { background: #f43f5e; box-shadow: 0 0 10px #f43f5e; }
+
+        .bento-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .bento-subtitle {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            margin-left: 22px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .bento-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        /* Modern Tactical Data Grid (Cumulative Table) */
+        .telemetry-table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(10, 15, 29, 0.5);
+        }
+
+        .telemetry-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            text-align: left;
+        }
+
+        .telemetry-table th {
+            background: rgba(255, 255, 255, 0.03);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            white-space: nowrap;
+        }
+
+        .telemetry-table td {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.92rem;
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #e2e8f0;
+            transition: background 0.2s;
+        }
+
+        .telemetry-table tbody tr:hover td {
+            background: rgba(56, 189, 248, 0.04);
+        }
+
+        .lane-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #ffffff;
+        }
+
+        .lane-color-pip {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .lane-pip-1 { background: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+        .lane-pip-2 { background: #10b981; box-shadow: 0 0 8px #10b981; }
+        .lane-pip-3 { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+        .lane-pip-4 { background: #818cf8; box-shadow: 0 0 8px #818cf8; }
+
+        .count-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #cbd5e1;
+            min-width: 32px;
+            text-align: center;
+        }
+
+        .count-badge.ambulance-alert {
+            background: rgba(244, 63, 94, 0.18);
+            border-color: rgba(244, 63, 94, 0.45);
+            color: #f43f5e;
+            box-shadow: 0 0 10px rgba(244, 63, 94, 0.2);
+            font-weight: 700;
+        }
+
+        .count-badge.lane-total {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        .telemetry-table tr.total-row {
+            background: rgba(16, 185, 129, 0.06);
+        }
+
+        .telemetry-table tr.total-row td {
+            border-top: 2px solid rgba(16, 185, 129, 0.3);
+            border-bottom: none;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .telemetry-table tr.total-row .count-badge {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #10b981;
+        }
+
+        /* Dual Chart Bento Grid */
+        .chart-bento-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        @media (min-width: 960px) {
+            .chart-bento-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .chart-hud-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .chart-hud-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3), transparent);
+        }
+
+        .chart-canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 310px;
+            margin-top: 14px;
+        }
+
+        /* Action & Export Command Bar */
+        .command-bar {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .command-bar-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .command-bar-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+        }
+
+        .command-bar-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 2px 0;
+        }
+
+        .command-bar-desc {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+        }
+
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-cyber {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 11px 20px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-cyber.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        .btn-cyber.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: #ffffff;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-cyber.primary {
+            background: linear-gradient(135deg, #0284c7, #0f766e);
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-cyber.primary:hover {
+            background: linear-gradient(135deg, #0369a1, #115e59);
+            border-color: #38bdf8;
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.5);
+        }
+
+        /* Footer */
+        .app-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 24px;
+            text-align: center;
+            background: #040810;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .footer-text {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Ambient Cyber Glow Backdrop -->
+    <div class="ambient-mesh-canvas">
+        <div class="ambient-orb ambient-orb-1"></div>
+        <div class="ambient-orb ambient-orb-2"></div>
+        <div class="ambient-orb ambient-orb-3"></div>
+    </div>
+
+    <!-- HUD Navigation -->
+    <nav class="analysis-nav">
+        <div class="nav-container">
+            <div class="brand-cluster">
+                <span class="signal-rail">
+                    <span></span><span></span><span></span>
+                </span>
+                <span class="brand-title">STMS</span>
+                <span class="nav-telemetry-badge">
+                    <span class="pulse-dot"></span> ANALYTICS HUD
+                </span>
+            </div>
+
+            <div class="nav-hud-center">
+                <div class="live-clock-pill" id="live-clock-hud">
+                    <span>🕒</span>
+                    <span id="hud-clock-time">--:--:-- UTC</span>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <a href="{{ url_for('dashboard') }}" class="nav-btn primary">
+                    <span>🚦 Live Feeds</span>
+                </a>
+                <a href="{{ url_for('challans') }}" class="nav-btn">
+                    <span>🚨 E-Challans</span>
+                </a>
+                <a href="{{ url_for('home') }}" class="nav-btn">
+                    <span>🏠 Command Center</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Viewport -->
+    <main class="analytics-viewport">
+
+        <!-- Header Ribbon -->
+        <header class="hud-header">
+            <div class="hud-header-left">
+                <div class="hud-badge-tag">
+                    <span>⚡ AI-POWERED JUNCTION TELEMETRY</span>
+                    <span>•</span>
+                    <span>MULTI-LANE ADAPTIVE ENGINE</span>
+                </div>
+                <h1 class="hud-title">System Analytics & Fleet Intelligence</h1>
+                <p class="hud-desc">
+                    Comprehensive historical flow analytics, dynamic green-time latency reduction, and multi-class vehicle classification metrics.
+                </p>
+            </div>
+            <div class="hud-header-right">
+                <div class="hud-cadence-pill">
+                    <span class="cadence-ping"></span>
+                    <span>LIVE STREAM: 3s CADENCE</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI Summary Bento Ribbon -->
+        <section class="kpi-grid">
+            <!-- KPI 1 -->
+            <div class="kpi-card" style="--card-accent: #38bdf8; --card-glow: rgba(56, 189, 248, 0.35);">
+                <div class="kpi-top">
+                    <div class="kpi-icon-orb cyan">🏎️</div>
+                    <span class="kpi-trend-chip positive">↑ Live Fleet Flow</span>
+                </div>
+                <div>
+                    <div class="kpi-val" id="kpi-total-flow">0</div>
+                    <div class="kpi-label">Total Cumulative Fleet Flow</div>
+                    <div class="kpi-subtext">Sum of cleared vehicles across 4 lanes</div>
+                </div>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="kpi-card" style="--card-accent: #10b981; --card-glow: rgba(16, 185, 129, 0.35);">
+                <div class="kpi-top">
+                    <div class="kpi-icon-orb emerald">⏱️</div>
+                    <span class="kpi-trend-chip positive">Dynamic Cycle</span>
+                </div>
+                <div>
+                    <div class="kpi-val" id="kpi-efficiency">38.4%</div>
+                    <div class="kpi-label">Average Wait Reduction</div>
+                    <div class="kpi-subtext">Compared to static 30s fixed cycle</div>
+                </div>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="kpi-card" style="--card-accent: #f43f5e; --card-glow: rgba(244, 63, 94, 0.35);">
+                <div class="kpi-top">
+                    <div class="kpi-icon-orb rose">🚑</div>
+                    <span class="kpi-trend-chip positive" id="kpi-ambulance-tag">Priority Ready</span>
+                </div>
+                <div>
+                    <div class="kpi-val" id="kpi-ambulances">0</div>
+                    <div class="kpi-label">Emergency Clearances</div>
+                    <div class="kpi-subtext">Zero-delay preemption corridor</div>
+                </div>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="kpi-card" style="--card-accent: #f59e0b; --card-glow: rgba(245, 158, 11, 0.35);">
+                <div class="kpi-top">
+                    <div class="kpi-icon-orb amber">🌿</div>
+                    <span class="kpi-trend-chip positive">Eco Shield</span>
+                </div>
+                <div>
+                    <div class="kpi-val" id="kpi-eco-savings">0.0 kg</div>
+                    <div class="kpi-label">Estimated CO₂ Abated</div>
+                    <div class="kpi-subtext">Reduced junction idling emissions</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cumulative Fleet Clearance Table (Bento Box) -->
+        <section class="bento-card">
+            <div class="bento-header">
+                <div>
+                    <div class="bento-title-cluster">
+                        <span class="bento-bullet"></span>
+                        <h2 class="bento-title">Cumulative Fleet Clearance (Per Lane & Class)</h2>
+                    </div>
+                    <span class="bento-subtitle">Recorded vehicle tallies aggregated upon transition to Red phase</span>
+                </div>
+                <div class="bento-tag">
+                    <span>REAL-TIME SENSOR COUNTS</span>
+                </div>
+            </div>
+
+            <div class="telemetry-table-wrapper">
+                <table class="telemetry-table">
+                    <thead>
+                        <tr>
+                            <th>Traffic Lane</th>
+                            <th>🚗 Cars</th>
+                            <th>🚌 Buses</th>
+                            <th>🚚 Trucks</th>
+                            <th>🏍️ Motorcycles</th>
+                            <th>🚑 Ambulances</th>
+                            <th>📊 Lane Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehicle-counts-body">
+                        <!-- Dynamic Rows Injected by JS -->
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #64748b; padding: 24px;">
+                                Initializing telemetry sensors...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Dual Chart Bento Grid -->
+        <section class="chart-bento-grid">
+            <!-- Chart 1: Current Traffic Density -->
+            <div class="chart-hud-card">
+                <div>
+                    <div class="bento-header" style="margin-bottom: 8px;">
+                        <div class="bento-title-cluster">
+                            <span class="bento-bullet emerald"></span>
+                            <h3 class="bento-title" style="font-size: 1.12rem;">Current Traffic Density (Live)</h3>
+                        </div>
+                        <span class="bento-tag" id="live-density-indicator">ACTIVE LOAD</span>
+                    </div>
+                    <p style="font-size: 0.82rem; color: #94a3b8; margin: 0 0 16px 22px;">
+                        Instantaneous vehicle accumulation queued across active camera sectors.
+                    </p>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="densityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: System Timing Efficiency -->
+            <div class="chart-hud-card">
+                <div>
+                    <div class="bento-header" style="margin-bottom: 8px;">
+                        <div class="bento-title-cluster">
+                            <span class="bento-bullet amber"></span>
+                            <h3 class="bento-title" style="font-size: 1.12rem;">System Efficiency & Cycle Adaptation</h3>
+                        </div>
+                        <span class="bento-tag">DYNAMIC VS 30s STATIC</span>
+                    </div>
+                    <p style="font-size: 0.82rem; color: #94a3b8; margin: 0 0 16px 22px;">
+                        Dynamic AI green allotment vs traditional fixed 30-second timer baseline.
+                    </p>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="efficiencyChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Export & Action Command Bar -->
+        <footer class="command-bar">
+            <div class="command-bar-info">
+                <div class="command-bar-icon">📊</div>
+                <div>
+                    <h4 class="command-bar-title">Audit & Compliance Reports</h4>
+                    <p class="command-bar-desc">Download cryptographic logs and junction telemetry in standardized CSV or PDF formats.</p>
+                </div>
+            </div>
+            <div class="action-group">
+                <a href="{{ url_for('generate_report') }}" class="btn-cyber secondary">
+                    <span>📥 Export CSV Data</span>
+                </a>
+                <a href="{{ url_for('generate_pdf_report') }}" class="btn-cyber secondary">
+                    <span>📄 Download PDF Report</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn-cyber primary">
+                    <span>🚦 Return to Dashboard &rarr;</span>
+                </a>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- App Footer -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="signal-rail"><span></span><span></span><span></span></span>
+                STMS Telemetry Engine
+            </div>
+            <div class="footer-text">
+                &copy; 2026 Smart Traffic Management System • Deep Learning YOLOv8 Autonomous Corridor
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chart & Live Data Logic -->
+    <script>
+        // --- Live UTC Clock ---
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            const clockEl = document.getElementById('hud-clock-time');
+            if (clockEl) {
+                clockEl.textContent = `${timeStr} LOCAL`;
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- Chart.js Global Setup ---
+        let densityChart, efficiencyChart;
+        const vehicleTypes = ['Car', 'Bus', 'Truck', 'Motorcycle', 'Ambulance'];
+
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'JetBrains Mono', 'Inter', monospace";
+        Chart.defaults.font.size = 11;
+
+        // Custom Tooltip Configuration
+        const customTooltip = {
+            backgroundColor: 'rgba(15, 23, 42, 0.92)',
+            titleColor: '#ffffff',
+            bodyColor: '#cbd5e1',
+            borderColor: 'rgba(56, 189, 248, 0.35)',
+            borderWidth: 1,
+            padding: 10,
+            cornerRadius: 8,
+            titleFont: { family: "'Space Grotesk', sans-serif", size: 12, weight: 'bold' }
+        };
+
+        // 1. Initialize Density Chart
+        const densityCtx = document.getElementById('densityChart').getContext('2d');
+        densityChart = new Chart(densityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Sector 1 (Lane 1)', 'Sector 2 (Lane 2)', 'Sector 3 (Lane 3)', 'Sector 4 (Lane 4)'],
+                datasets: [{
+                    label: 'Live Density (Vehicles)',
+                    data: [0, 0, 0, 0],
+                    backgroundColor: [
+                        'rgba(56, 189, 248, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(129, 140, 248, 0.8)'
+                    ],
+                    borderColor: [
+                        '#38bdf8',
+                        '#10b981',
+                        '#f59e0b',
+                        '#818cf8'
+                    ],
+                    borderWidth: 1.5,
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: customTooltip
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 2, color: '#64748b' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        border: { dash: [4, 4], color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#94a3b8' },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // 2. Initialize Efficiency Chart
+        const efficiencyCtx = document.getElementById('efficiencyChart').getContext('2d');
+        efficiencyChart = new Chart(efficiencyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4'],
+                datasets: [
+                    {
+                        label: 'Smart Adaptive Time (s)',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                        borderColor: '#10b981',
+                        borderWidth: 1.5,
+                        borderRadius: 6,
+                        borderSkipped: false
+                    },
+                    {
+                        label: 'Static 30s Baseline',
+                        data: [30, 30, 30, 30],
+                        backgroundColor: 'rgba(244, 63, 94, 0.25)',
+                        borderColor: 'rgba(244, 63, 94, 0.7)',
+                        borderWidth: 1.5,
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#e2e8f0',
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 16
+                        }
+                    },
+                    tooltip: customTooltip
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Green Light Duration (Seconds)', color: '#64748b' },
+                        ticks: { stepSize: 10, color: '#64748b' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        border: { dash: [4, 4], color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#94a3b8' },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // --- Data Fetching and Dynamic Rendering ---
+        async function fetchAnalysisData() {
+            try {
+                const response = await fetch('/api/analysis_data');
+                if (!response.ok) throw new Error('API request failed');
+
+                const data = await response.json();
+
+                // 1. Update Telemetry Table & Compute Global KPI Metrics
+                updateVehicleTables(data.cumulative_counts);
+
+                // 2. Update Density Chart
+                updateDensityGraph(data.current_density);
+
+                // 3. Update Efficiency Chart
+                updateEfficiencyGraph(data.last_green_times);
+
+            } catch (error) {
+                console.error("Error fetching analysis telemetry:", error);
+            }
+        }
+
+        function updateVehicleTables(cumulativeData) {
+            const tableBody = document.getElementById('vehicle-counts-body');
+            if (!tableBody || !cumulativeData) return;
+
+            let grandTotal = 0;
+            let totalAmbulances = 0;
+            const columnTotals = { 'Car': 0, 'Bus': 0, 'Truck': 0, 'Motorcycle': 0, 'Ambulance': 0 };
+
+            let html = '';
+
+            for (let i = 1; i <= 4; i++) {
+                const laneData = cumulativeData[i] || {};
+                let laneSum = 0;
+
+                html += `<tr>
+                    <td>
+                        <div class="lane-pill">
+                            <span class="lane-color-pip lane-pip-${i}"></span>
+                            <span>Lane ${i}</span>
+                        </div>
+                    </td>`;
+
+                vehicleTypes.forEach(vehicle => {
+                    const count = laneData[vehicle] || 0;
+                    laneSum += count;
+                    columnTotals[vehicle] += count;
+
+                    if (vehicle === 'Ambulance' && count > 0) {
+                        html += `<td><span class="count-badge ambulance-alert">🚑 ${count}</span></td>`;
+                    } else {
+                        html += `<td><span class="count-badge">${count}</span></td>`;
+                    }
+                });
+
+                grandTotal += laneSum;
+                html += `<td><span class="count-badge lane-total">${laneSum}</span></td></tr>`;
+            }
+
+            // Summary Total Row
+            html += `<tr class="total-row">
+                <td>
+                    <div class="lane-pill" style="color: #10b981;">
+                        <span>⚡ FLEET TOTAL</span>
+                    </div>
+                </td>
+                <td><span class="count-badge">${columnTotals['Car']}</span></td>
+                <td><span class="count-badge">${columnTotals['Bus']}</span></td>
+                <td><span class="count-badge">${columnTotals['Truck']}</span></td>
+                <td><span class="count-badge">${columnTotals['Motorcycle']}</span></td>
+                <td><span class="count-badge">${columnTotals['Ambulance']}</span></td>
+                <td><span class="count-badge" style="font-size: 1rem;">${grandTotal}</span></td>
+            </tr>`;
+
+            tableBody.innerHTML = html;
+
+            // Update KPI Ribbon counters smoothly
+            totalAmbulances = columnTotals['Ambulance'];
+            const flowEl = document.getElementById('kpi-total-flow');
+            if (flowEl) flowEl.textContent = grandTotal.toLocaleString();
+
+            const ambEl = document.getElementById('kpi-ambulances');
+            if (ambEl) ambEl.textContent = totalAmbulances.toLocaleString();
+
+            const ecoEl = document.getElementById('kpi-eco-savings');
+            if (ecoEl) {
+                // Approximate 0.12kg CO2 saved per vehicle idle reduction
+                const co2Saved = (grandTotal * 0.12).toFixed(1);
+                ecoEl.textContent = `${co2Saved} kg`;
+            }
+        }
+
+        function updateDensityGraph(densityData) {
+            if (!densityData || !densityChart) return;
+            const dataArray = [
+                densityData[1] || 0,
+                densityData[2] || 0,
+                densityData[3] || 0,
+                densityData[4] || 0
+            ];
+            densityChart.data.datasets[0].data = dataArray;
+            densityChart.update();
+        }
+
+        function updateEfficiencyGraph(greenTimeData) {
+            if (!greenTimeData || !efficiencyChart) return;
+            const dataArray = [
+                greenTimeData[1] || 0,
+                greenTimeData[2] || 0,
+                greenTimeData[3] || 0,
+                greenTimeData[4] || 0
+            ];
+            efficiencyChart.data.datasets[0].data = dataArray;
+            efficiencyChart.update();
+        }
+
+        // Poll every 3 seconds
+        setInterval(fetchAnalysisData, 3000);
+        fetchAnalysisData();
+    </script>
+    <script src="{{ url_for('static', filename='js/interactive.js') }}"></script>
+</body>
+
+</html>
