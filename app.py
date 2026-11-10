@@ -1,3 +1,4 @@
+import pandas as pd 
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -6,11 +7,11 @@ import re
 import cv2
 import traceback
 import time
-import threading
+import threading   
 import hashlib    
 from functools import wraps
 from datetime import datetime  
-import csv
+import csv      
 import io
 from flask import Flask, render_template, request, redirect, url_for, Response, jsonify, session, flash, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
