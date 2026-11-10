@@ -46,22 +46,22 @@ except ImportError:
 UPLOAD_FOLDER = 'uploads'           
 ALLOWED_EXTENSIONS = {'mp4', 'avi', 'mov', 'mkv'}
 
-# MySQL Configuration (loaded from .env with fallback defaults)
+# MySQL Configuration (loaded strictly from .env)
 DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
 DB_USER = os.getenv("DB_USER", "root")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 DB_NAME = os.getenv("DB_NAME", "traffic_db")
 
-# Default account that is seeded on first run (loaded from .env)
-DEFAULT_ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "traffic-admin")
-DEFAULT_ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "adminpassword")   
+# Default account credentials (loaded strictly from .env, zero secrets in code)
+DEFAULT_ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+DEFAULT_ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 USERNAME_RE = re.compile(r'^[A-Za-z0-9_.-]{3,32}$')
 EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "your_super_secret_key_for_sessions")      
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY") or os.urandom(24).hex()      
 
 # --- Database Setup ---
 def get_db():
@@ -131,14 +131,15 @@ def setup_database():
     except Exception:
         pass
 
-    cursor.execute("SELECT * FROM users WHERE username = %s", (DEFAULT_ADMIN_USERNAME,))
-    if cursor.fetchone() is None:
-        hashed_password = generate_password_hash(DEFAULT_ADMIN_PASSWORD)
-        cursor.execute(
-            "INSERT INTO users (username, email, password_hash, role) VALUES (%s, %s, %s, %s)",
-            (DEFAULT_ADMIN_USERNAME, None, hashed_password, 'admin')
-        )
-        print("Admin user created in MySQL database.")
+    if DEFAULT_ADMIN_USERNAME and DEFAULT_ADMIN_PASSWORD:
+        cursor.execute("SELECT * FROM users WHERE username = %s", (DEFAULT_ADMIN_USERNAME,))
+        if cursor.fetchone() is None:
+            hashed_password = generate_password_hash(DEFAULT_ADMIN_PASSWORD)
+            cursor.execute(
+                "INSERT INTO users (username, email, password_hash, role) VALUES (%s, %s, %s, %s)",
+                (DEFAULT_ADMIN_USERNAME, None, hashed_password, 'admin')
+            )
+            print("Admin user created in MySQL database.")
 
     conn.commit()
     conn.close()
