@@ -5,4 +5,5 @@ easyocr
 mysql-connector-python
 pyserial
 fpdf
-cloudinary   
+cloudinary
+python-dotenv

@@ -11,7 +11,7 @@ import hashlib
 from functools import wraps
 from datetime import datetime  
 import csv      
-import io
+import io 
 from flask import Flask, render_template, request, redirect, url_for, Response, jsonify, session, flash, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from detector import TrafficDetector
@@ -19,26 +19,49 @@ from traffic_logic import TrafficLogic
 from violation_detector import ViolationDetector   
 import mysql.connector      
                                                         
+# Load environment variables (.env)
+def _load_env_fallback():
+    env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+    if os.path.exists(env_file):
+        try:
+            with open(env_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('#') or '=' not in line:
+                        continue
+                    k, v = line.split('=', 1)
+                    k, v = k.strip(), v.strip().strip('"\'')
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+        except Exception:
+            pass
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    _load_env_fallback()
+
 # --- Configuration ---   
 UPLOAD_FOLDER = 'uploads'           
 ALLOWED_EXTENSIONS = {'mp4', 'avi', 'mov', 'mkv'}
 
-# MySQL Configuration (Default XAMPP settings)
-DB_HOST = "127.0.0.1"
-DB_USER = "root"
-DB_PASSWORD = ""
-DB_NAME = "traffic_db"
+# MySQL Configuration (loaded from .env with fallback defaults)
+DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+DB_NAME = os.getenv("DB_NAME", "traffic_db")
 
-# Default account that is seeded on first run
-DEFAULT_ADMIN_USERNAME = 'traffic-admin'
-DEFAULT_ADMIN_PASSWORD = 'adminpassword'   
+# Default account that is seeded on first run (loaded from .env)
+DEFAULT_ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "traffic-admin")
+DEFAULT_ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "adminpassword")   
 
 USERNAME_RE = re.compile(r'^[A-Za-z0-9_.-]{3,32}$')
 EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SECRET_KEY'] = 'your_super_secret_key_for_sessions'
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "your_super_secret_key_for_sessions")      
 
 # --- Database Setup ---
 def get_db():
